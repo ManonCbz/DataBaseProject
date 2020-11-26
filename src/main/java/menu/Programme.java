@@ -16,27 +16,10 @@ public class Programme {
 		User u1 = new User("test", "test", "test");
 		listeUtilisateurs.add(u1);
 		
-		System.out.println("test");
-		
 		Scanner scan = new Scanner(System.in);
 		int choice = 0;
 		
 		User utilisateurConnecte = null;
-		
-		// ======================================= //
-//		String commande = scan.nextLine();
-//		createTable(commande, db);
-//		
-//		String commande2 = scan.nextLine();
-//		createTable(commande2, db);
-//		
-//		String commande3 = scan.nextLine();
-//		createTable(commande3, db);
-//		
-//		System.out.println();
-//		db.affichageStructure();
-		
-		// ======================================= //
 		
 		do {
 			utilisateurConnecte = log(scan, listeUtilisateurs);			
@@ -128,6 +111,9 @@ public class Programme {
 			Pattern p6 = Pattern.compile("^UPDATE \\w+ SET \\w+ = '[a-zA-Z0-9 ]+'(, \\w+ = '[a-zA-Z0-9 ]+')* WHERE \\w+ = '[a-zA-Z0-9 ]+';$");
 			Matcher m6 = p6.matcher(commande);
 
+			Pattern p7 = Pattern.compile("^SELECT \\* FROM \\w+;$");
+			Matcher m7 = p7.matcher(commande);
+			
 			// Conditions qui lance chaque commande -> Finir les contrôles (vérifications) et appeler les fonctions)
 				
 			// Si la commande est : CREATE DATABASE
@@ -144,7 +130,7 @@ public class Programme {
 				}
 			}
 			// Si la commande est autre mais pas de DB utilisé
-			if (dbUtilisee == null && (m3.find() == true || m4.find() == true || m5.find() == true || m6.find() == true)) {
+			if (dbUtilisee == null && (m3.find() == true || m4.find() == true || m5.find() == true || m6.find() == true || m7.find() == true)) {
 				commandeOk = true;
 				System.out.println("   Vous devez d'abord selectionner une base de données");
 			}
@@ -158,7 +144,7 @@ public class Programme {
 			// Si la commande est INSERT INTO
 			else if (dbUtilisee != null && m4.find() == true) {
 				commandeOk = true;
-				
+				insertInto(commande, dbUtilisee);
 			}
 			// Si la commande est UPDATE
 			else if (dbUtilisee != null && m5.find() == true) {
@@ -170,7 +156,11 @@ public class Programme {
 				commandeOk = true;
 				updateSyntaxe3(commande, dbUtilisee);
 			}
-			
+			//Si la commande est SELECT * FROM
+			else if (dbUtilisee != null && m7.find() == true) {
+				commandeOk = true;
+				selectAll(commande, dbUtilisee);
+			}
 			else if (!commande.equals("QUITTER") && commandeOk == false){
 				System.out.println("   Commande incorrecte");
 			}
@@ -182,6 +172,8 @@ public class Programme {
 		System.out.println("+--------------------------------------------------------+");
 		System.out.println("Au revoir");
 	}
+	
+	// ======================================================================================== //
 	
 	public static DataBase selectDB(String saisie, ArrayList<DataBase> listeBaseDeDonnnees) {
 		
@@ -229,6 +221,8 @@ public class Programme {
 	}
 
 	public static void createTable(String saisie, DataBase db) {
+		
+		boolean doublon = false;
 		        
         // On retire CREATE TABLE
 		
@@ -252,10 +246,87 @@ public class Programme {
         for (int i = 0; i < liste.length; i++) {
             listeDeColonne.add(liste[i]);
         }
-                
-        Table table = db.creerTable(nomTable);
-        table.creerColonne(listeDeColonne);
+        
+        for (Table t : db.getListeDesTables()) {
+        	if (t.getNom().equals(nomTable)) {
+        		doublon = true;
+        		System.out.println("   Cette table existe déjà");
+        		break;
+        	}
+        }
+        
+        if (doublon == false) {
+        	Table table = db.creerTable(nomTable);
+        	table.creerColonne(listeDeColonne);
+    		System.out.println("   La table " + nomTable + " a bien été crée");
+        }
     }
+	
+	public static void insertInto(String saisie, DataBase db) {
+		
+        String[] etape0 = saisie.split("INSERT INTO ");
+        
+        // On retire la premiere parenthèse "("
+        
+        String[] etape1 = etape0[1].split(" VALUES\\(");
+        String nomTable = etape1[0];
+        
+        // On retire la deuxième parenthèse ")"
+        
+        String[] etape2 = etape1[1].split("\\)");
+        
+        // On retire les virgules et les espaces ", " et on obtient une liste de String
+        
+        String [] liste = etape2[0].split(", ");
+        
+        ArrayList <String> listeDeValeurs = new ArrayList <String> ();
+        
+        for (int i = 0; i < liste.length; i++) {
+        	listeDeValeurs.add(liste[i]);
+        }
+        
+		boolean tableIsInDB = false;
+        
+        for (Table t : db.getListeDesTables()) {
+        	if (t.getNom().equals(nomTable)) {
+        		tableIsInDB = true;
+        		t.ajoutLigne(listeDeValeurs);
+        		System.out.println("   Les données sont enregistrées");
+        		break;
+        	}
+        }
+        
+        if (tableIsInDB == false) {
+        	System.out.println("   Cette table n'existe pas");
+        }
+        
+                
+	}
+
+	public static void selectAll(String saisie, DataBase db) {
+        
+		String[] etape0 = saisie.split("SELECT \\* FROM ");
+        
+        // On retire la premiere parenthèse "("
+        
+        String[] etape1 = etape0[1].split(";");
+        String nomTable = etape1[0];
+        
+		boolean tableIsInDB = false;
+        
+        for (Table t : db.getListeDesTables()) {
+        	if (t.getNom().equals(nomTable)) {
+        		tableIsInDB = true;
+        		t.affichageDeDonnees();
+        		break;
+        	}
+        }
+        
+        if (tableIsInDB == false) {
+        	System.out.println("   Cette table n'existe pas");
+        }
+        
+	}
 	
 	public static void updateSyntaxe1(String saisie, DataBase db) {
 		//"UPDATE nomTable SET nom_du_champ = 'nouvelle valeur';"
@@ -360,4 +431,55 @@ public class Programme {
 		}
 		
 	}	
+	
+	public static void deleteSyntaxe1(String saisie, DataBase db) {
+		//"DELETE FROM  nomTable ;"
+		System.out.println("\nSaisie :" +saisie);
+		String[] etape0 = saisie.split(";");//vire le ';'
+		String[] etape1 = etape0[0].split("DELETE FROM ");//vire le "DELETE FROM "
+		String nomTable = etape1[1]; // get nom de la table
+		System.out.println("Nom de la table: " + nomTable);
+		
+		for (Table t : db.getListeDesTables()) {
+			
+			if (t.getNom().equals(nomTable)) {
+				
+				System.out.println(t.getNom());
+			
+				t.supprimerEnsembleLigne();
+				
+				break;
+			}
+		}
+	}
+	
+	
+	
+	public static void deleteSyntaxe2(String saisie, DataBase db) {
+		
+		//"DELETE FROM nomTable WHERE nom_du_champ = 'valeur';"
+		System.out.println("\nSaisie :" +saisie);
+		String[] etape0 = saisie.split(";");//vire le ';'
+		String[] etape1 = etape0[0].split("DELETE FROM ");//vire le "DELETE FROM "
+		etape0 = etape1[1].split("WHERE ");//split au WHERE
+		String nomTable = etape0[0]; // get nom de la table
+		etape1 = etape0[1].split(" = ");//split au =
+		String nomDeColonne = etape1[0];
+		etape0 = etape1[1].split("'");
+		String valeur = etape0[1];
+		
+		System.out.println("Nom de la table: " +nomTable+ "\nNom de colonne: " +nomDeColonne + "\nValeur: "+valeur);
+	
+		for (Table t : db.getListeDesTables()) {
+			
+			if (t.getNom().equals(nomTable)) {
+				
+				System.out.println(t.getNom());
+			
+				t.supprimerLigneCible(valeur, nomDeColonne);;
+				
+				break;
+			}
+		}
+	}
 }
