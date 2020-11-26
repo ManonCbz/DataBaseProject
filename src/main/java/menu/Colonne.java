@@ -35,6 +35,13 @@ public class Colonne {
 		this.ligne = ligne;
 	}
 	
+	//Replace tous le contenu d'une colonne par une valeur
+	public void setallContenu (String nouveauContenu) {
+		for (Integer cible : ligne.keySet()) {
+			ligne.replace(cible, nouveauContenu);
+		}
+	}
+	
 	// ======================= Méthodes ======================= //
 	
 	// Retourne le contenu d'une colonne
