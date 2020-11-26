@@ -16,6 +16,8 @@ public class Programme {
 		User u1 = new User("test", "test", "test");
 		listeUtilisateurs.add(u1);
 		
+		System.out.println("test");
+		
 		Scanner scan = new Scanner(System.in);
 		int choice = 0;
 		
