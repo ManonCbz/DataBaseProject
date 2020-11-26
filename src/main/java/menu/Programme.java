@@ -291,7 +291,7 @@ public class Programme {
         	if (t.getNom().equals(nomTable)) {
         		tableIsInDB = true;
         		t.ajoutLigne(listeDeValeurs);
-        		System.out.println("   Les données sont enregistrées");
+        		System.out.println("  Les données sont enregistrées");
         		break;
         	}
         }
