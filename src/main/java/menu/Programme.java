@@ -9,14 +9,21 @@ public class Programme {
 
 	public static void main(String[] args) {
 		
+		// Listes de données de notre application
+		
 		ArrayList<User> listeUtilisateurs = new ArrayList<User>();
 		ArrayList<DataBase> listeBasesDeDonnees = new ArrayList<DataBase>();
 		
-		// Utilisateur test
+		// Création d'un utilisateur test
+		
 		User u1 = new User("test", "test", "test");
 		listeUtilisateurs.add(u1);
 		
+		// Début du programme
+		
 		Scanner scan = new Scanner(System.in);
+		
+		// Vérifie si un utilisateur est connecté avec log(), si ok menu();
 				
 		User utilisateurConnecte = null;
 		
@@ -26,6 +33,9 @@ public class Programme {
 		while (utilisateurConnecte == null);
 
 		menu(scan, listeBasesDeDonnees);
+		
+		System.out.println("+--------------------------------------------------------+");
+		System.out.println("Au revoir");
 		
 	}
 	
@@ -72,6 +82,8 @@ public class Programme {
 		return user;
 	}
 	
+	// Menu d'affichage qui vérifie les patterns & appel les méthodes de saisie
+	
 	public static void menu(Scanner scan, ArrayList<DataBase> listeBaseDeDonnnees) {
 
 		String commande = "";
@@ -90,7 +102,7 @@ public class Programme {
 			commande = scan.nextLine();
 			boolean commandeOk = false;
 
-			// Patterns pour vérifier les commandes
+			// ============= Patterns pour vérifier les commandes saisies par l'utilisateur ============= //
 
 			Pattern p1 = Pattern.compile("^CREATE DATABASE \\w+;$");
 			Matcher m1 = p1.matcher(commande);
@@ -113,8 +125,10 @@ public class Programme {
 			Pattern p7 = Pattern.compile("^SELECT \\* FROM \\w+;$");
 			Matcher m7 = p7.matcher(commande);
 			
-			// Conditions qui lance chaque commande -> Finir les contrôles (vérifications) et appeler les fonctions)
-				
+			// ============= Conditions qui lance chaque commande & leurs méthodes ============= //
+
+			// ===== Pour la base de donnée : 
+			
 			// Si la commande est : CREATE DATABASE
 			if (m1.find() == true) {
 				createDB(commande, listeBaseDeDonnnees);
@@ -128,11 +142,15 @@ public class Programme {
 					System.out.println("SQL - " + dbUtilisee.getNom() + " > \n");
 				}
 			}
-			// Si la commande est autre mais pas de DB utilisé
+		
+			// ===== Si la commande est correcte mais que l'utilisateur n'a pas sélectionné de DB
+			
 			if (dbUtilisee == null && (m3.find() == true || m4.find() == true || m5.find() == true || m6.find() == true || m7.find() == true)) {
 				commandeOk = true;
 				System.out.println("   Vous devez d'abord selectionner une base de données");
 			}
+			
+			// ===== Si la commande est correcte et qu'une db est sélectionné (Appel des méthodes de saisies)
 			
 			// Si la commande est CREATE TABLE
 			if (dbUtilisee != null && m3.find() == true) {
@@ -140,6 +158,7 @@ public class Programme {
 				createTable(commande, dbUtilisee);
 				dbUtilisee.affichageStructure();
 			}
+			
 			// Si la commande est INSERT INTO
 			else if (dbUtilisee != null && m4.find() == true) {
 				commandeOk = true;
@@ -151,37 +170,46 @@ public class Programme {
 				commandeOk = true;
 				updateSyntaxe1(commande, dbUtilisee);
 			}
+			
 			// Si la commande est UPDATE WHERE
 			else if (dbUtilisee != null && m6.find() == true) {
 				commandeOk = true;
 				updateSyntaxe3(commande, dbUtilisee);
 			}
+			
 			//Si la commande est SELECT * FROM
 			else if (dbUtilisee != null && m7.find() == true) {
 				commandeOk = true;
 				selectAll(commande, dbUtilisee);
 			}
+			
+			// Si la commande ne correspond à aucun des patterns ni a la commande de sortie
 			else if (!commande.equals("QUITTER") && commandeOk == false){
 				System.out.println("   Commande incorrecte");
 			}
 			
 
-		}
+		} // Commande de sortie, pour quitter l'application
 		while (!commande.equals("QUITTER"));
-		
-		System.out.println("+--------------------------------------------------------+");
-		System.out.println("Au revoir");
 	}
 	
 	// ======================================================================================== //
+
+	// Méthode de saisie pour USE nomDB;
+	// Retourne la base de donnée (menu() -> syntaxe m2 (USE ..))
+	// Elle servira à verifier si une base de données est sélectionné
 	
 	public static DataBase selectDB(String saisie, ArrayList<DataBase> listeBaseDeDonnnees) {
 		
 		DataBase db = null;
 		
+		// Split des elements à retirer de la saisie
+		
         String[] etape0 = saisie.split("USE ");
         String[] etape1 = etape0[1].split("\\;");
         String nomDB = etape1[0];
+        
+        // Si la base de donnée existe
         
         for (DataBase d : listeBaseDeDonnnees) {
         	if (d.getNom().equals(nomDB)) {
@@ -197,13 +225,20 @@ public class Programme {
 		return db;
 	}
 	
+	// Méthode de saisie pour CREATE DATABASE nomDB;
+	// Vérifie si doublon & Ajoute la base de données dans la liste de db du programme
+	
 	public static void createDB(String saisie, ArrayList<DataBase> listeBaseDeDonnnees) {
 		
 		boolean doublon = false;
 		
+		// Split des elements à retirer de la saisie
+		
         String[] etape0 = saisie.split("CREATE DATABASE ");
         String[] etape1 = etape0[1].split("\\;");
         String nomDB = etape1[0];
+        
+        // Vérifie si la base de donnée existe déjà
         
         for (DataBase d : listeBaseDeDonnnees) {
         	if (d.getNom().equals(nomDB)) {
@@ -219,28 +254,26 @@ public class Programme {
     		System.out.println("   La base de données " + nomDB + " a bien été crée");
         }
 	}
-
+	
+	// Méthode de saisie pour CREATE TABLE nomTable(colonne1, colonne2);
+	// Appel les méthodes de Database.java & Table.java pour créer la table et les colonnes (si pas de doublon)
+	
 	public static void createTable(String saisie, DataBase db) {
 		
 		boolean doublon = false;
-		        
-        // On retire CREATE TABLE
+		
+		// Split des elements à retirer de la saisie et mise en variable/liste des elements à conserver
 		
         String[] etape0 = saisie.split("CREATE TABLE ");
         
         String nomFichier= etape0[1];
-        nomFichier=nomFichier.replace(',', ';');
-        // On retire la premiere parenthèse "("
+        nomFichier = nomFichier.replace(',', ';');
         
         String[] etape1 = etape0[1].split("\\(");
         String nomTable = etape1[0];
-        
-        // On retire la deuxième parenthèse ")"
-        
+                
         String[] etape2 = etape1[1].split("\\)");
-        
-        // On retire les virgules et les espaces ", " et on obtient une liste de String
-        
+                
         String [] liste = etape2[0].split(", ");
         
         ArrayList <String> listeDeColonne = new ArrayList <String> ();
@@ -248,6 +281,8 @@ public class Programme {
         for (int i = 0; i < liste.length; i++) {
             listeDeColonne.add(liste[i]);
         }
+        
+        // Vérifie si la table n'a pas de doublon
         
         for (Table t : db.getListeDesTables()) {
         	if (t.getNom().equals(nomTable)) {
@@ -257,6 +292,8 @@ public class Programme {
         	}
         }
         
+        // Appel de la fonction creerTable & creerColonne (Class Database.java & Table.java)
+        
         if (doublon == false) {
         	Table table = db.creerTable(nomTable);
         	table.creerColonne(listeDeColonne, nomFichier);
@@ -264,25 +301,21 @@ public class Programme {
         }
     }
 	
+	// Méthode de saisie pour INSERT INTO nomTable VALUES('colonne1', 'colonne2');
+	// Appel la méthode ajoutLigne() de Table.java pour ajouter des valeurs à la table concernée
+	
 	public static void insertInto(String saisie, DataBase db) {
 		
+		// Split des elements à retirer de la saisie et mise en variable/liste des elements à conserver
+		
         String[] etape0 = saisie.split("INSERT INTO ");
-        
-        // On retire la premiere parenthèse "("
-        
-        String[] etape1 = etape0[1].split(" VALUES\\(");//Espace après VALUES
-        String nomTable = etape1[0];
-        
-        // On retire la deuxième parenthèse ")"
-        
-        String[] etape2 = etape1[1].split("\\)");
-        
-        // On retire les virgules et les espaces ", " et on obtient une liste de String avec 'valeur'
                 
-        String [] liste = etape2[0].split(", ");
-        
-        // on parcoure cette liste et on retire les "'"; 
-        
+        String[] etape1 = etape0[1].split(" VALUES\\(");
+        String nomTable = etape1[0];
+                
+        String[] etape2 = etape1[1].split("\\)");
+                        
+        String [] liste = etape2[0].split(", ");        
         
         ArrayList <String> listeDeValeurs = new ArrayList <String> ();
         
@@ -290,6 +323,8 @@ public class Programme {
         	String[] temp = liste[i].split("'");
         	listeDeValeurs.add(temp[1]);
         }
+        
+        // Vérifie que la table existe & appel de la méthode ajoutLigne() de Table.java
         
 		boolean tableIsInDB = false;
         
@@ -304,19 +339,22 @@ public class Programme {
         
         if (tableIsInDB == false) {
         	System.out.println("   Cette table n'existe pas");
-        }
-        
-                
+        }       
 	}
-
+	
+	// Méthode de saisie pour INSERT INTO nomTable VALUES('colonne1', 'colonne2');
+	// Appel la méthode ajoutLigne() de Table.java pour ajouter des valeurs à la table concernée
+	
 	public static void selectAll(String saisie, DataBase db) {
+		
+		// Split des elements à retirer de la saisie
         
 		String[] etape0 = saisie.split("SELECT \\* FROM ");
-        
-        // On retire la premiere parenthèse "("
-        
+                
         String[] etape1 = etape0[1].split(";");
         String nomTable = etape1[0];
+        
+        // Vérifie si la table existe & appel la méthode affichageDeDonnees() de Table.java
         
 		boolean tableIsInDB = false;
         
@@ -333,6 +371,8 @@ public class Programme {
         }
         
 	}
+	
+	// ====================== En cours de traitement ====================== //
 	
 	public static void updateSyntaxe1(String saisie, DataBase db) {
 		//"UPDATE nomTable SET nom_du_champ = 'nouvelle valeur';"
@@ -459,8 +499,6 @@ public class Programme {
 			}
 		}
 	}
-	
-	
 	
 	public static void deleteSyntaxe2(String saisie, DataBase db) {
 		
