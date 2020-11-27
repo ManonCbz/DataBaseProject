@@ -141,12 +141,13 @@ public class Programme {
 				createTable(commande, dbUtilisee);
 				dbUtilisee.affichageStructure();
 			}
-			// Si la commande est INSERT INTO
+			// Si la commande est UPDATE
 			else if (dbUtilisee != null && m4.find() == true) {
 				commandeOk = true;
 				insertInto(commande, dbUtilisee);
 			}
-			// Si la commande est UPDATE
+			
+			// Si la commande est INSERT INTO
 			else if (dbUtilisee != null && m5.find() == true) {
 				commandeOk = true;
 				updateSyntaxe1(commande, dbUtilisee);
@@ -268,21 +269,25 @@ public class Programme {
         
         // On retire la premiere parenthèse "("
         
-        String[] etape1 = etape0[1].split(" VALUES\\(");
+        String[] etape1 = etape0[1].split(" VALUES\\(");//Espace après VALUES
         String nomTable = etape1[0];
         
         // On retire la deuxième parenthèse ")"
         
         String[] etape2 = etape1[1].split("\\)");
         
-        // On retire les virgules et les espaces ", " et on obtient une liste de String
-        
+        // On retire les virgules et les espaces ", " et on obtient une liste de String avec 'valeur'
+                
         String [] liste = etape2[0].split(", ");
+        
+        // on parcoure cette liste et on retire les "'"; 
+        
         
         ArrayList <String> listeDeValeurs = new ArrayList <String> ();
         
         for (int i = 0; i < liste.length; i++) {
-        	listeDeValeurs.add(liste[i]);
+        	String[] temp = liste[i].split("'");
+        	listeDeValeurs.add(temp[1]);
         }
         
 		boolean tableIsInDB = false;
