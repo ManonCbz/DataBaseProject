@@ -361,9 +361,10 @@ public class Programme {
 				listeValeurs.add(nouvelleValeur);
 				
 				t.modifierContenuColonne(listeNomDeColonne, listeValeurs);
-
+				System.out.println(listeNomDeColonne.toString());
 				break;
 			}
+			
 		}
 		
 	}
