@@ -228,6 +228,8 @@ public class Programme {
 		
         String[] etape0 = saisie.split("CREATE TABLE ");
         
+        String nomFichier= etape0[1];
+        nomFichier=nomFichier.replace(',', ';');
         // On retire la premiere parenthèse "("
         
         String[] etape1 = etape0[1].split("\\(");
@@ -257,7 +259,7 @@ public class Programme {
         
         if (doublon == false) {
         	Table table = db.creerTable(nomTable);
-        	table.creerColonne(listeDeColonne);
+        	table.creerColonne(listeDeColonne, nomFichier);
     		System.out.println("   La table " + nomTable + " a bien été crée");
         }
     }

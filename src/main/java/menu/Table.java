@@ -38,7 +38,7 @@ public class Table {
 
 	// ======================= Méthodes ======================= //
 	
-	public void creerColonne(ArrayList<String> listeNomColonne) {
+	public void creerColonne(ArrayList<String> listeNomColonne, String nomFichier) {
 		
 		Colonne newColonne = null;
 		boolean doublon = false;
@@ -54,6 +54,7 @@ public class Table {
 			if (doublon == false) {
 				newColonne = new Colonne(nom);
 				this.listeDeColonne.add(newColonne);
+				this.nomFichier=nomFichier;
 			}
 			else {
 				System.out.println("Il y a déjà une colonne avec ce nom, celle-ci ne sera pas ajouté");
