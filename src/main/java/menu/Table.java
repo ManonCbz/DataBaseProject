@@ -135,7 +135,8 @@ public class Table {
 		}
 		this.methodeAfficheLigne();
 		// affichage des noms de colonnes en entétes:
-	} //A FAIRE*********************
+	}
+	//FAIT
 	
 	// (3 - Syntaxe 2) Affiche les données concernées par la liste pour certaines colonnes
 	// Vide
@@ -150,7 +151,7 @@ public class Table {
 		}
 		temp.affichageDeDonnees();
 		}
-	//A FAIRE*********************
+	//FAIT
 	
 	// ================== UPDATE ================== //
 	
@@ -163,9 +164,10 @@ public class Table {
 				if (cible.getNom().equals(nomDeColonne.get(i))) {
 					cible.setallContenu(nouveauContenu.get(i));
 				}
+			System.out.println("yep");
 		}
 	
-	}//A DISCUTER
+	}//FAIT
 	
 	// (4 UPDATE - Syntaxe 3) Toutes les lignes de cette colonne qui contiennent une valeur précise sont modifier par le nouveau contenu
 	// Vide
