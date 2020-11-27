@@ -111,7 +111,6 @@ public class Table {
 	// (3 - Syntaxe 1) Affichage de toutes les données de la table
 	// Vide
 	public void affichageDeDonnees() {
-		int compteLigne = 0;
 		//Entete avec les colonnes
 		this.methodeAfficheLigne();
 		for (int i = 0; i< this.listeDeColonne.size(); i++) {
@@ -130,7 +129,6 @@ public class Table {
 	// (3 - Syntaxe 2) Affiche les données concernées par la liste pour certaines colonnes
 	// Vide
 	public void affichageColonne(ArrayList<String> listeDeColonne) {
-		int compteLigne = 0;
 		//	ArrayList <Colonne> temp = this.getListeDeColonne()
 		// affichage des noms de colonnes en entétes:
 			//VERSION DISCUTER AFFICHAGE

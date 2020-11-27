@@ -17,8 +17,7 @@ public class Programme {
 		listeUtilisateurs.add(u1);
 		
 		Scanner scan = new Scanner(System.in);
-		int choice = 0;
-		
+				
 		User utilisateurConnecte = null;
 		
 		do {
