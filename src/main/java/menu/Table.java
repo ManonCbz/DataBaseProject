@@ -9,14 +9,16 @@ public class Table {
 	private String nom;
 	private int index = 0;
 	private ArrayList<Colonne> listeDeColonne = new ArrayList<Colonne>();
+	private String nomFichier = "";
 		
 	// ===================== Constructeurs ===================== //
 	
 	public Table(String nom) {
 		this.nom = nom;
+		this.nomFichier = this.nomFichier.concat(nom);
 	}
 	
-	// =================== Getters & Setters =================== //
+	// =================== Getters Z& Setters =================== //
 
 	public String getNom() {
 		return nom;
@@ -40,7 +42,6 @@ public class Table {
 		
 		Colonne newColonne = null;
 		boolean doublon = false;
-		
 		for (String nom : listeNomColonne) {
 			
 			for (Colonne c : this.listeDeColonne) {
