@@ -13,7 +13,7 @@ public class Table {
 		
 	// ===================== Constructeurs ===================== //
 	
-	public Table(String nom, String nomFichier) {
+	public Table(String nom) {
 		this.nom = nom;
 		this.nomFichier = this.nomFichier.concat(nomFichier);
 	}
