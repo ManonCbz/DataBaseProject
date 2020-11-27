@@ -140,26 +140,34 @@ public class Table {
 	// (3 - Syntaxe 2) Affiche les données concernées par la liste pour certaines colonnes
 	// Vide
 	public void affichageColonne(ArrayList<String> listeDeColonne) {
-		//	ArrayList <Colonne> temp = this.getListeDeColonne()
-		// affichage des noms de colonnes en entétes:
-			//VERSION DISCUTER AFFICHAGE
+		//	Creer une table temporaire avec ses colonnes
+		Table temp = new Table (this.getNom());
+		for (Colonne cible: this.listeDeColonne) {
+			for (int i=0; i<listeDeColonne.size(); i++)
+				if (cible.getNom().contentEquals(listeDeColonne.get(index)) ) {
+					temp.listeDeColonne.add(cible);
+				}
+		}
+		temp.affichageDeDonnees();
 		}
 	//A FAIRE*********************
 	
 	// ================== UPDATE ================== //
 	
-	// (4 - Syntaxe 1 & 2) Toutes les lignes de cette colonne sont modifier par le nouveau contenu
+	// (4 UPDATE- Syntaxe 1 & 2) Toutes les lignes de cette colonne sont modifier par le nouveau contenu
 	// Vide
 	public void modifierContenuColonne(ArrayList<String> nomDeColonne, ArrayList<String> nouveauContenu) {//TABLE DANS TABLE????????
 		
-		for (int i = 0; i < nomDeColonne.size(); i++) {
-			System.out.println(nomDeColonne.get(i));
-			System.out.println(nouveauContenu.get(i));
+		for (Colonne cible : listeDeColonne) {
+			for (int i=0; i<nomDeColonne.size(); i++)
+				if (cible.getNom().equals(nomDeColonne.get(i))) {
+					cible.setallContenu(nouveauContenu.get(i));
+				}
 		}
 	
 	}//A DISCUTER
 	
-	// (4 - Syntaxe 3) Toutes les lignes de cette colonne qui contiennent une valeur précise sont modifier par le nouveau contenu
+	// (4 UPDATE - Syntaxe 3) Toutes les lignes de cette colonne qui contiennent une valeur précise sont modifier par le nouveau contenu
 	// Vide
 	public void modifierContenuCible(String nomDeColonne, String nouveauContenu, String nomCible) {
 	
