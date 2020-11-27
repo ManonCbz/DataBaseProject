@@ -36,8 +36,18 @@ public class Table {
 		this.listeDeColonne = listeDeColonne;
 	}
 
+	
+	
 	// ======================= Méthodes ======================= //
 	
+	public String getNomFichier() {
+		return nomFichier;
+	}
+
+	public void setNomFichier(String nomFichier) {
+		this.nomFichier = nomFichier;
+	}
+
 	public void creerColonne(ArrayList<String> listeNomColonne, String nomFichier) {
 		
 		Colonne newColonne = null;
