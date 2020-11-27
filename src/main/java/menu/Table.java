@@ -115,7 +115,7 @@ public class Table {
 		//Si non, un message d'erreur est affiché.
 		} else System.out.println("Nombre de nouvelle valeurs entrées incorrecte");
 		
-	} //FAIT*********************
+	} //FAIT
 
 	// =============== READ(SELECT) =============== //
 	
@@ -173,9 +173,21 @@ public class Table {
 	// Vide
 	public void modifierContenuCible(String nomDeColonne, String nouveauContenu, String nomCible) {
 	
+		for (Colonne cible: this.listeDeColonne)
+		{
+			if (cible.getNom().contentEquals(nomDeColonne)) {
+				for (int i=0; i<cible.getLenght() ; i++) {
+					if (cible.getContenu(i).equals(nomCible)) {
+						cible.setContenu(nomCible, nouveauContenu);
+					}
+				}
+				
+			}
+		}
 		System.out.println(nomDeColonne + " " + nouveauContenu + " " + nomCible);
 		
-	}
+	}//FAIT
+	
 	// ================== DELETE ================== //
 
 	// (5 - Syntaxe 1) Toutes les lignes de toutes les colonnes sont supprimées (reste le nom des colonnes)

@@ -35,6 +35,10 @@ public class Colonne {
 		this.ligne = ligne;
 	}
 	
+	public int getLenght () {
+		return this.ligne.size();	
+	}
+	
 	//Replace tous le contenu d'une colonne par une valeur
 	public void setallContenu (String nouveauContenu) {
 		for (Integer cible : ligne.keySet()) {
