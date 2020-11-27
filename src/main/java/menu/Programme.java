@@ -36,7 +36,7 @@ public class Programme {
 		
 		System.out.println("+--------------------------------------------------------+");
 		System.out.println("Au revoir");
-		
+				
 	}
 	
 	
@@ -125,6 +125,9 @@ public class Programme {
 			Pattern p7 = Pattern.compile("^SELECT \\* FROM \\w+;$");
 			Matcher m7 = p7.matcher(commande);
 			
+			Pattern p8 = Pattern.compile("^SELECT \\w+(, [a-zA-Z0-9 ]+)* FROM \\w+;$");
+			Matcher m8 = p8.matcher(commande);
+			
 			// ============= Conditions qui lance chaque commande & leurs méthodes ============= //
 
 			// ===== Pour la base de donnée : 
@@ -145,7 +148,7 @@ public class Programme {
 		
 			// ===== Si la commande est correcte mais que l'utilisateur n'a pas sélectionné de DB
 			
-			if (dbUtilisee == null && (m3.find() == true || m4.find() == true || m5.find() == true || m6.find() == true || m7.find() == true)) {
+			if (dbUtilisee == null && (m3.find() == true || m4.find() == true || m5.find() == true || m6.find() == true || m7.find() == true || m8.find() == true)) {
 				commandeOk = true;
 				System.out.println("   Vous devez d'abord selectionner une base de données");
 			}
@@ -181,6 +184,12 @@ public class Programme {
 			else if (dbUtilisee != null && m7.find() == true) {
 				commandeOk = true;
 				selectAll(commande, dbUtilisee);
+			}
+			
+			// Si la commande est SELECT colonne FROM nomTable
+			else if (dbUtilisee != null && m8.find() == true) {
+				commandeOk = true;
+				selectFrom(commande, dbUtilisee);
 			}
 			
 			// Si la commande ne correspond à aucun des patterns ni a la commande de sortie
@@ -332,7 +341,7 @@ public class Programme {
         	if (t.getNom().equals(nomTable)) {
         		tableIsInDB = true;
         		t.ajoutLigne(listeDeValeurs);
-        		System.out.println("  Les données sont enregistrées");
+        		System.out.println("   Les données sont enregistrées");
         		break;
         	}
         }
@@ -342,8 +351,8 @@ public class Programme {
         }       
 	}
 	
-	// Méthode de saisie pour INSERT INTO nomTable VALUES('colonne1', 'colonne2');
-	// Appel la méthode ajoutLigne() de Table.java pour ajouter des valeurs à la table concernée
+	// Méthode de saisie pour SELECT * FROM nomTable;
+	// Appel la méthode affichageDeDonnees() de Table.java pour afficher toutes les données sous forme de tableau
 	
 	public static void selectAll(String saisie, DataBase db) {
 		
@@ -370,6 +379,60 @@ public class Programme {
         	System.out.println("   Cette table n'existe pas");
         }
         
+	}
+	
+	// Méthode de saisie pour SELECT nom_du_champ FROM nomTable;
+	//
+	
+	public static void selectFrom(String saisie, DataBase db) {
+		
+		// Split des elements à retirer de la saisie et mise en variable/liste des elements à conserver
+		
+        String[] etape0 = saisie.split("SELECT ");
+        
+        String[] etape1 = etape0[1].split(" FROM ");
+        String nomColonne = etape1[0];
+                
+        String[] etape2 = etape1[1].split(";");
+        String nomTable = etape2[0];
+        
+        for (int i = 0; i < etape0.length; i++) {
+        	System.out.println("0" + etape0[i]);
+        }
+        
+        for (int i = 0; i < etape1.length; i++) {
+        	System.out.println("1" + etape1[i]);
+        }
+        
+        for (int i = 0; i < etape2.length; i++) {
+        	System.out.println("2" + etape2[i]);
+        }
+        
+        System.out.println("nomColonne : " + nomColonne + " nomTable : " + nomTable);
+        
+        ArrayList <String> listeDeColonne = new ArrayList <String> ();
+        
+        for (int i = 0; i < etape2.length; i++) {
+            listeDeColonne.add(etape2[i]);
+            System.out.println(etape2[i]);
+        }
+        
+        // Vérifie si la table existe & appel la méthode affichageColonne() de Table.java
+        
+//		boolean tableIsInDB = false;
+//        
+//        for (Table t : db.getListeDesTables()) {
+//        	if (t.getNom().equals(nomTable)) {
+//        		tableIsInDB = true;
+//        		t.affichageColonne(listeDeColonne);
+//        		break;
+//        	}
+//        }
+//        
+//        if (tableIsInDB == false) {
+//        	System.out.println("   Cette table n'existe pas");
+//        }
+		
 	}
 	
 	// ====================== En cours de traitement ====================== //
