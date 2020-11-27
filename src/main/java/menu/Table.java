@@ -13,9 +13,9 @@ public class Table {
 		
 	// ===================== Constructeurs ===================== //
 	
-	public Table(String nom) {
+	public Table(String nom, String nomFichier) {
 		this.nom = nom;
-		this.nomFichier = this.nomFichier.concat(nom);
+		this.nomFichier = this.nomFichier.concat(nomFichier);
 	}
 	
 	// =================== Getters Z& Setters =================== //
