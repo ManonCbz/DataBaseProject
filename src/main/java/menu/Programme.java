@@ -381,6 +381,8 @@ public class Programme {
         
 	}
 	
+	// ====================== En cours de traitement ====================== //
+	
 	// Méthode de saisie pour SELECT nom_du_champ FROM nomTable;
 	//
 	
@@ -396,47 +398,29 @@ public class Programme {
         String[] etape2 = etape1[1].split(";");
         String nomTable = etape2[0];
         
-        for (int i = 0; i < etape0.length; i++) {
-        	System.out.println("0" + etape0[i]);
-        }
-        
-        for (int i = 0; i < etape1.length; i++) {
-        	System.out.println("1" + etape1[i]);
-        }
-        
-        for (int i = 0; i < etape2.length; i++) {
-        	System.out.println("2" + etape2[i]);
-        }
-        
         System.out.println("nomColonne : " + nomColonne + " nomTable : " + nomTable);
         
         ArrayList <String> listeDeColonne = new ArrayList <String> ();
-        
-        for (int i = 0; i < etape2.length; i++) {
-            listeDeColonne.add(etape2[i]);
-            System.out.println(etape2[i]);
-        }
+        listeDeColonne.add(nomColonne);
         
         // Vérifie si la table existe & appel la méthode affichageColonne() de Table.java
         
-//		boolean tableIsInDB = false;
-//        
-//        for (Table t : db.getListeDesTables()) {
-//        	if (t.getNom().equals(nomTable)) {
-//        		tableIsInDB = true;
-//        		t.affichageColonne(listeDeColonne);
-//        		break;
-//        	}
-//        }
-//        
-//        if (tableIsInDB == false) {
-//        	System.out.println("   Cette table n'existe pas");
-//        }
+		boolean tableIsInDB = false;
+        
+        for (Table t : db.getListeDesTables()) {
+        	if (t.getNom().equals(nomTable)) {
+        		tableIsInDB = true;
+        		t.affichageColonne(listeDeColonne);
+        		break;
+        	}
+        }
+        
+        if (tableIsInDB == false) {
+        	System.out.println("   Cette table n'existe pas");
+        }
 		
 	}
-	
-	// ====================== En cours de traitement ====================== //
-	
+		
 	public static void updateSyntaxe1(String saisie, DataBase db) {
 		//"UPDATE nomTable SET nom_du_champ = 'nouvelle valeur';"
 		System.out.println("\nSaisie: " +saisie);
