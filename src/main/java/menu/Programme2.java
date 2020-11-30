@@ -390,10 +390,10 @@ public class Programme2 {
         String[] etape1 = etape0[1].split(";");
         String nomTable = etape1[0];
         
-        // Vérifie si la table existe & appel la méthode affichageDeDonnees() de Table.java
+        // Vérifie si la table & la colonne existent & appel la méthode affichageDeDonnees() de Table.java
         
 		boolean tableIsInDB = false;
-        
+		
         for (Table t : db.getListeDesTables()) {
         	if (t.getNom().equals(nomTable)) {
         		tableIsInDB = true;
@@ -408,10 +408,8 @@ public class Programme2 {
         
 	}
 	
-	// ====================== En cours de traitement ====================== //
-	
 	// Méthode de saisie pour SELECT nom_du_champ FROM nomTable;
-	// Appel la méthode affichageDeColonne() de Table.java pour afficher les colonnes demandées
+	// Appel la méthode affichageDeColonne() de Table.java pour afficher la colonne demandée
 	
 	public static void selectFrom(String saisie, DataBase db) {
 		
@@ -428,23 +426,35 @@ public class Programme2 {
         System.out.println("nomColonne : " + nomColonne + " nomTable : " + nomTable);
         
         ArrayList <String> listeDeColonne = new ArrayList <String> ();
-        listeDeColonne.add(nomColonne);
         
-        // Vérifie si la table existe & appel la méthode affichageColonne() de Table.java
-        
-		boolean tableIsInDB = false;
-     
+     // Vérifie si la table existe & si la colonne existe dans cette table  
+        boolean tableIsInDB = false;
+        boolean colonneIsInTable = false;
+        Table temp = new Table(nomColonne);
         for (Table t : db.getListeDesTables()) {
         	if (t.getNom().equals(nomTable)) {
         		tableIsInDB = true;
-        		t.affichageColonne(listeDeColonne);
-        		break;
+        		for (Colonne cible : t.getListeDeColonne())
+        			if (cible.getNom().equals(nomColonne)) {
+        				listeDeColonne.add(nomColonne);
+        				colonneIsInTable = true;
+		        		temp = t;
+        			}
+		        		
+		        		
         	}
         }
-        
         if (tableIsInDB == false) {
         	System.out.println("   Cette table n'existe pas");
+        } 
+        if (tableIsInDB&&(colonneIsInTable == false)) {
+        	System.out.println("   Cette colonne n'existe pas");
+        	}
+        if ( tableIsInDB && colonneIsInTable) {
+        	temp.affichageColonne(listeDeColonne);
         }
+        	
+ 
 		
 	}
 		

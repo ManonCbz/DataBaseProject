@@ -144,12 +144,15 @@ public class Table {
 		//	Creer une table temporaire avec ses colonnes
 		Table temp = new Table (this.getNom());
 		for (Colonne cible: this.listeDeColonne) {
+			System.out.println(cible.toString());
 			for (int i=0; i<listeDeColonne.size(); i++)
-				if (cible.getNom().contentEquals(listeDeColonne.get(i)) ) {
+				if (cible.getNom().equals(listeDeColonne.get(i)) ) {
 					temp.listeDeColonne.add(cible);
 				}
 		}
+		System.out.println("BOOP");
 		temp.affichageDeDonnees();
+		System.out.println("BOOP");
 		}
 	//FAIT
 	
@@ -175,7 +178,7 @@ public class Table {
 	
 		for (Colonne cible: this.listeDeColonne)
 		{
-			if (cible.getNom().contentEquals(nomDeColonne)) {
+			if (cible.getNom().equals(nomDeColonne)) {
 				for (int i=0; i<cible.getLenght() ; i++) {
 					if (cible.getContenu(i).equals(nomCible)) {
 						cible.setContenu(nomCible, nouveauContenu);
