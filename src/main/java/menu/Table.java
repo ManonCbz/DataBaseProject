@@ -145,7 +145,7 @@ public class Table {
 		Table temp = new Table (this.getNom());
 		for (Colonne cible: this.listeDeColonne) {
 			for (int i=0; i<listeDeColonne.size(); i++)
-				if (cible.getNom().contentEquals(listeDeColonne.get(index)) ) {
+				if (cible.getNom().contentEquals(listeDeColonne.get(i)) ) {
 					temp.listeDeColonne.add(cible);
 				}
 		}
