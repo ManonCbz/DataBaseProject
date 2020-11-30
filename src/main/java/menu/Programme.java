@@ -1,5 +1,10 @@
 package menu;
 
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.regex.Matcher;
@@ -12,7 +17,7 @@ public class Programme {
 		// Listes de données de notre application
 		
 		ArrayList<User> listeUtilisateurs = new ArrayList<User>();
-		ArrayList<DataBase> listeBasesDeDonnees = new ArrayList<DataBase>();
+		ArrayList<DataBase> listeBasesDeDonnees = deserialize();
 		
 		// Création d'un utilisateur test
 		
@@ -36,7 +41,7 @@ public class Programme {
 		
 		System.out.println("+--------------------------------------------------------+");
 		System.out.println("Au revoir");
-				
+		
 	}
 	
 	
@@ -134,7 +139,7 @@ public class Programme {
 			Pattern p10 = Pattern.compile("^DELETE FROM \\w+ WHERE \\w+ = '\\w+';$");
 			Matcher m10 = p10.matcher(commande);
 			
-			Pattern p11 = Pattern.compile("^SHOW TABLES ;$");
+			Pattern p11 = Pattern.compile("^SHOW TABLES;$");
 			Matcher m11 = p11.matcher(commande);
 			
 			// ============= Conditions qui lance chaque commande & leurs méthodes ============= //
@@ -145,6 +150,7 @@ public class Programme {
 			if (m1.find() == true) {
 				createDB(commande, listeBaseDeDonnnees);
 				commandeOk = true;
+				serialize(listeBaseDeDonnnees);
 			}
 			// Si la commande est : USE DATABASE
 			else if (m2.find() == true) {
@@ -169,24 +175,28 @@ public class Programme {
 				commandeOk = true;
 				createTable(commande, dbUtilisee);
 				dbUtilisee.affichageStructure();
+				serialize(listeBaseDeDonnnees);
 			}
 			
 			// Si la commande est INSERT INTO
 			else if (dbUtilisee != null && m4.find() == true) {
 				commandeOk = true;
 				insertInto(commande, dbUtilisee);
+				serialize(listeBaseDeDonnnees);
 			}
 			
 			// Si la commande est UPDATE
 			else if (dbUtilisee != null && m5.find() == true) {
 				commandeOk = true;
 				updateSyntaxe1(commande, dbUtilisee);
+				serialize(listeBaseDeDonnnees);
 			}
 			
 			// Si la commande est UPDATE WHERE
 			else if (dbUtilisee != null && m6.find() == true) {
 				commandeOk = true;
 				updateSyntaxe3(commande, dbUtilisee);
+				serialize(listeBaseDeDonnnees);
 			}
 			
 			//Si la commande est SELECT * FROM
@@ -205,12 +215,14 @@ public class Programme {
 			else if (dbUtilisee != null && m9.find() == true) {
 				commandeOk = true;
 				deleteSyntaxe1(commande, dbUtilisee);
+				serialize(listeBaseDeDonnnees);
 			}
 			
 			// Si la commande est DELETE FROM nomTable WHERE nom_du_champ = 'valeur'
 			else if (dbUtilisee != null && m10.find() == true) {
 				commandeOk = true;
 				deleteSyntaxe2(commande, dbUtilisee);
+				serialize(listeBaseDeDonnnees);
 			}
 			
 			// Si la commande est SHOW TABLES;
@@ -289,7 +301,7 @@ public class Programme {
     		listeBaseDeDonnnees.add(db);
     		System.out.println("   La base de données " + nomDB + " a bien été crée");
         }
-	}
+     }
 	
 	// Méthode de saisie pour CREATE TABLE nomTable(colonne1, colonne2);
 	// Appel les méthodes de Database.java & Table.java pour créer la table et les colonnes (si pas de doublon)
@@ -631,4 +643,45 @@ public class Programme {
 			}
 		}
 	}
+
+	
+	// ====================== Serialize / Deserialize ====================== //
+	
+	static void serialize(ArrayList<DataBase> liste) {
+	    
+		try {
+	        
+			FileOutputStream fos = new FileOutputStream("C:\\Users\\MDenh\\Documents\\txt\\DataBase.txt");
+	        ObjectOutputStream outputStream = new ObjectOutputStream(fos);
+	        
+	        outputStream.writeObject(liste);
+	        outputStream.close();
+	        
+	    }
+	    catch (IOException e) {
+	    	
+	        e.getMessage();
+	        
+	    }
+	}
+	
+	static ArrayList<DataBase> deserialize() {
+		
+	    ArrayList<DataBase> listePersonne = new ArrayList<>();
+	    
+	    try {
+	           FileInputStream fichier = new FileInputStream("C:\\Users\\MDenh\\Documents\\txt\\DataBase.txt");
+	           ObjectInputStream objet = new ObjectInputStream(fichier);
+	            
+	           listePersonne = (ArrayList) objet.readObject();
+	            
+	           objet.close();
+	           fichier.close();
+	           
+	      } 
+	          catch (IOException | ClassNotFoundException ex) {
+	           System.err.println(ex);
+	      }
+	      return listePersonne;
+	}  
 }

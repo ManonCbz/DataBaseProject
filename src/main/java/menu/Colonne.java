@@ -1,10 +1,11 @@
 package menu;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map.Entry;
 
-public class Colonne {
+public class Colonne implements Serializable{
 	
 	// ======================= Attributs ======================== //
 	

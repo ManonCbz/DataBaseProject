@@ -1,8 +1,9 @@
 package menu;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class DataBase {
+public class DataBase implements Serializable{
 	
 	// ======================= Attributs ======================== //
 	
