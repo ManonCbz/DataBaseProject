@@ -148,19 +148,32 @@ public class Table implements Serializable {
 		//	Creer une table temporaire avec ses colonnes
 		Table temp = new Table (this.getNom());
 		for (Colonne cible: this.listeDeColonne) {
-			System.out.println(cible.toString());
-			for (int i=0; i<listeDeColonne.size(); i++)
+				for (int i=0; i<listeDeColonne.size(); i++)
 				if (cible.getNom().equals(listeDeColonne.get(i)) ) {
 					temp.listeDeColonne.add(cible);
-					System.out.println("Ajout de " +cible.getNom()+" A "+temp.getNom() +"BOOP!");
-				}
+					}
 		}
-		System.out.println("BOOP");
-		temp.affichageDeDonnees();
+		System.out.println("+----------+");
+		System.out.print("|");
+		String titre = temp.listeDeColonne.get(0).getNom();
+		System.out.print(titre);
+		for (int i=0;i< (12 -( 2+titre.length() )); i++ ){
+			System.out.print(" ");
+		}
+		System.out.print("|\n");
+		System.out.println("+----------+");
 		for (int i=0; i <temp.getListeDeColonne().get(0).getLenght(); i++) {
-			System.out.println(temp.getListeDeColonne().get(0).getContenu(i));
+			System.out.print("|");
+			String tempStr = temp.getListeDeColonne().get(0).getContenu(i); 
+			System.out.print(tempStr);
+			for (int j=0;j< (12 -( 2+tempStr.length() )) ;j++ ){
+				System.out.print(" ");
+			}
+			System.out.print("|\n");
+			
 		}
-		System.out.println("BOOP");
+		
+		System.out.println("+----------+");
 		}
 	//FAIT
 	
