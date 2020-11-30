@@ -5,7 +5,7 @@ import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class Programme2 {
+public class Programme {
 
 	public static void main(String[] args) {
 		
@@ -115,7 +115,7 @@ public class Programme2 {
 
 			Pattern p4 = Pattern.compile("^INSERT INTO \\w+ VALUES\\('[a-zA-Z0-9 ]+'(, '[a-zA-Z0-9 ]+')*\\);$");
 			Matcher m4 = p4.matcher(commande);
-										 
+
 			Pattern p5 = Pattern.compile("^UPDATE \\w+ SET \\w+ = '[a-zA-Z0-9 ]+'(, \\w+ = '[a-zA-Z0-9 ]+')*;$");
 			Matcher m5 = p5.matcher(commande);
 
@@ -127,6 +127,16 @@ public class Programme2 {
 			
 			Pattern p8 = Pattern.compile("^SELECT \\w+(, [a-zA-Z0-9 ]+)* FROM \\w+;$");
 			Matcher m8 = p8.matcher(commande);
+			
+			Pattern p9 = Pattern.compile("^DELETE FROM \\w+;$");
+			Matcher m9 = p9.matcher(commande);
+			
+			Pattern p10 = Pattern.compile("^DELETE FROM \\w+ WHERE \\w+ = '\\w+';$");
+			Matcher m10 = p10.matcher(commande);
+			
+			Pattern p11 = Pattern.compile("^SHOW TABLES ;$");
+			Matcher m11 = p11.matcher(commande);
+			
 			
 			// ============= Conditions qui lance chaque commande & leurs méthodes ============= //
 
@@ -148,7 +158,7 @@ public class Programme2 {
 		
 			// ===== Si la commande est correcte mais que l'utilisateur n'a pas sélectionné de DB
 			
-			if (dbUtilisee == null && (m3.find() == true || m4.find() == true || m5.find() == true || m6.find() == true || m7.find() == true || m8.find() == true)) {
+			if (dbUtilisee == null && (m3.find() == true || m4.find() == true || m5.find() == true || m6.find() == true || m7.find() == true || m8.find() == true || m9.find() == true || m10.find() == true || m10.find() == true) ) {
 				commandeOk = true;
 				System.out.println("   Vous devez d'abord selectionner une base de données");
 			}
@@ -159,7 +169,6 @@ public class Programme2 {
 			if (dbUtilisee != null && m3.find() == true) {
 				commandeOk = true;
 				createTable(commande, dbUtilisee);
-				dbUtilisee.affichageStructure();
 			}
 			
 			// Si la commande est INSERT INTO
@@ -191,6 +200,24 @@ public class Programme2 {
 				commandeOk = true;
 				selectFrom(commande, dbUtilisee);
 			}
+			
+			// Si la commande est DELETE FROM nomTable
+			else if (dbUtilisee != null && m9.find() == true) {
+				commandeOk = true;
+				deleteSyntaxe1(commande, dbUtilisee);
+			}
+			
+			// Si la commande est DELETE FROM nomTable WHERE nom_du_champ = 'valeur'
+			else if (dbUtilisee != null && m10.find() == true) {
+				commandeOk = true;
+				deleteSyntaxe2(commande, dbUtilisee);
+			}
+			
+			// Si la commande est SHOW TABLES
+						else if (dbUtilisee != null && m11.find() == true) {
+							commandeOk = true;
+							dbUtilisee.affichageStructure();
+						}
 			
 			// Si la commande ne correspond à aucun des patterns ni a la commande de sortie
 			else if (!commande.equals("QUITTER") && commandeOk == false){
@@ -381,8 +408,10 @@ public class Programme2 {
         
 	}
 	
+	// ====================== En cours de traitement ====================== //
+	
 	// Méthode de saisie pour SELECT nom_du_champ FROM nomTable;
-	//
+	// Appel la méthode affichageDeColonne() de Table.java pour afficher les colonnes demandées
 	
 	public static void selectFrom(String saisie, DataBase db) {
 		
@@ -396,47 +425,29 @@ public class Programme2 {
         String[] etape2 = etape1[1].split(";");
         String nomTable = etape2[0];
         
-        for (int i = 0; i < etape0.length; i++) {
-        	System.out.println("0" + etape0[i]);
-        }
-        
-        for (int i = 0; i < etape1.length; i++) {
-        	System.out.println("1" + etape1[i]);
-        }
-        
-        for (int i = 0; i < etape2.length; i++) {
-        	System.out.println("2" + etape2[i]);
-        }
-        
         System.out.println("nomColonne : " + nomColonne + " nomTable : " + nomTable);
         
         ArrayList <String> listeDeColonne = new ArrayList <String> ();
-        
-        for (int i = 0; i < etape2.length; i++) {
-            listeDeColonne.add(etape2[i]);
-            System.out.println(etape2[i]);
-        }
+        listeDeColonne.add(nomColonne);
         
         // Vérifie si la table existe & appel la méthode affichageColonne() de Table.java
         
-//		boolean tableIsInDB = false;
-//        
-//        for (Table t : db.getListeDesTables()) {
-//        	if (t.getNom().equals(nomTable)) {
-//        		tableIsInDB = true;
-//        		t.affichageColonne(listeDeColonne);
-//        		break;
-//        	}
-//        }
-//        
-//        if (tableIsInDB == false) {
-//        	System.out.println("   Cette table n'existe pas");
-//        }
+		boolean tableIsInDB = false;
+     
+        for (Table t : db.getListeDesTables()) {
+        	if (t.getNom().equals(nomTable)) {
+        		tableIsInDB = true;
+        		t.affichageColonne(listeDeColonne);
+        		break;
+        	}
+        }
+        
+        if (tableIsInDB == false) {
+        	System.out.println("   Cette table n'existe pas");
+        }
 		
 	}
-	
-	// ====================== En cours de traitement ====================== //
-	
+		
 	public static void updateSyntaxe1(String saisie, DataBase db) {
 		//"UPDATE nomTable SET nom_du_champ = 'nouvelle valeur';"
 		System.out.println("\nSaisie: " +saisie);
