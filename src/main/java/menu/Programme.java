@@ -134,6 +134,9 @@ public class Programme {
 			Pattern p10 = Pattern.compile("^DELETE FROM \\w+ WHERE \\w+ = '\\w+';$");
 			Matcher m10 = p10.matcher(commande);
 			
+			Pattern p11 = Pattern.compile("^SHOW TABLES ;$");
+			Matcher m11 = p11.matcher(commande);
+			
 			// ============= Conditions qui lance chaque commande & leurs méthodes ============= //
 
 			// ===== Pour la base de donnée : 
@@ -154,7 +157,7 @@ public class Programme {
 		
 			// ===== Si la commande est correcte mais que l'utilisateur n'a pas sélectionné de DB
 			
-			if (dbUtilisee == null && (m3.find() == true || m4.find() == true || m5.find() == true || m6.find() == true || m7.find() == true || m8.find() == true || m9.find() == true || m10.find() == true)) {
+			if (dbUtilisee == null && (m3.find() == true || m4.find() == true || m5.find() == true || m6.find() == true || m7.find() == true || m8.find() == true || m9.find() == true || m10.find() == true || m11.find() == true)) {
 				commandeOk = true;
 				System.out.println("   Vous devez d'abord selectionner une base de données");
 			}
@@ -210,6 +213,12 @@ public class Programme {
 				deleteSyntaxe2(commande, dbUtilisee);
 			}
 			
+			// Si la commande est SHOW TABLES;
+			else if (dbUtilisee != null && m11.find() == true) {
+				commandeOk = true;
+				dbUtilisee.affichageStructure();
+			}
+			
 			// Si la commande ne correspond à aucun des patterns ni a la commande de sortie
 			else if (!commande.equals("QUITTER") && commandeOk == false){
 				System.out.println("   Commande incorrecte");
@@ -253,7 +262,7 @@ public class Programme {
 	}
 	
 	// Méthode de saisie pour CREATE DATABASE nomDB;
-	// Vérifie si doublon & Ajoute la base de données dans la liste de db du programme
+	// Vérifie si doublon & ajoute la base de données dans la liste de db du programme
 	
 	public static void createDB(String saisie, ArrayList<DataBase> listeBaseDeDonnnees) {
 		
@@ -399,11 +408,91 @@ public class Programme {
         
 	}
 	
-	// ====================== En cours de traitement ====================== //
+	// Méthode de saisie pour DELETE FROM nomTable;
+	// Appel la méthode supprimerEnsembleLigne() de Table.java pour effacer toutes les données
 	
+	public static void deleteSyntaxe1(String saisie, DataBase db) {
+
+		// Split des elements à retirer de la saisie
+
+		String[] etape0 = saisie.split(";");
+		String[] etape1 = etape0[0].split("DELETE FROM ");
+		String nomTable = etape1[1];
+		
+        // Vérifie si la table existe & appel la méthode supprimerEnsembleLigne() de Table.java
+		
+		boolean tableIsInDB = false;
+		
+		for (Table t : db.getListeDesTables()) {
+			
+			if (t.getNom().equals(nomTable)) {
+				t.supprimerEnsembleLigne();
+				tableIsInDB = true;
+				break;
+			}
+		}
+		
+        if (tableIsInDB == false) {
+        	System.out.println("   Cette table n'existe pas");
+        }
+	}
+	
+	// Méthode de saisie pour UPDATE nomTable SET nom_du_champ = 'nouvelle valeur';
+	// Appel la méthode modifierContenuColonne() de Table.java pour effacer toutes les données
+
+	public static void updateSyntaxe1(String saisie, DataBase db) {
+
+		// Split des elements à retirer de la saisie
+		
+		String[] etape0 = saisie.split(";");
+		String[] etape1 = etape0[0].split("UPDATE ");
+		etape0 = etape1[1].split(" SET ");
+		String nomTable = etape0[0];
+		
+		etape1 = etape0[1].split(" = ");
+		String nomDeColonne= etape1[0];
+		etape0=etape1[1].split("'");
+		String nouvelleValeur = etape0[1];
+		
+		
+        // Vérifie si la table existe & appel la méthode modifierContenuColonne() de Table.java
+		
+		boolean tableIsInDB = false;
+		
+		for (Table t : db.getListeDesTables()) {
+						
+			if (t.getNom().equals(nomTable)) {
+				
+				tableIsInDB = true;
+				
+				ArrayList<String> listeNomDeColonne = new ArrayList<String>();
+				ArrayList<String> listeValeurs = new ArrayList<String>();
+				
+				listeNomDeColonne.add(nomDeColonne);
+				listeValeurs.add(nouvelleValeur);
+				
+				t.modifierContenuColonne(listeNomDeColonne, listeValeurs);
+				System.out.println("   La colonne " + nomDeColonne + " à bien été mise à jour");
+				break;
+			}
+			
+		}
+		
+        if (tableIsInDB == false) {
+        	System.out.println("   Cette table n'existe pas");
+        }
+		
+	}
+
+	// ====================== En cours de traitement ====================== //
+		
 	// Méthode de saisie pour SELECT nom_du_champ FROM nomTable;
 	// Appel la méthode affichageDeColonne() de Table.java pour afficher les colonnes demandées
 	
+	
+	// ***** saisie (ok une colonne, ko + d'1) *****
+	// ***** fonctions table ko (IndexOutOfBoundsException) *****
+
 	public static void selectFrom(String saisie, DataBase db) {
 		
 		// Split des elements à retirer de la saisie et mise en variable/liste des elements à conserver
@@ -438,42 +527,9 @@ public class Programme {
         }
 		
 	}
-		
-	public static void updateSyntaxe1(String saisie, DataBase db) {
-		//"UPDATE nomTable SET nom_du_champ = 'nouvelle valeur';"
-		System.out.println("\nSaisie: " +saisie);
-		String[] etape0 = saisie.split(";"); // vire le ';'
-		String[] etape1 = etape0[0].split("UPDATE ");//vire le UPDATE
-		etape0 = etape1[1].split(" SET "); // split au SER
-		String nomTable = etape0[0]; // Récupère nom de table
-		etape1 = etape0[1].split(" = ");// split au =
-		String nomDeColonne= etape1[0]; // Récupère nom de colonne
-		etape0=etape1[1].split("'"); // split au '
-		String nouvelleValeur = etape0[1]; //Récupère valeur
 
-		System.out.println("nom de la table: " +nomTable + "\nnomDeColonne: " + nomDeColonne+ "\nnouvelle Valeur: "+nouvelleValeur);
-		
-		for (Table t : db.getListeDesTables()) {
-						
-			if (t.getNom().equals(nomTable)) {
-				
-				System.out.println(t.getNom());
-				
-				ArrayList<String> listeNomDeColonne = new ArrayList<String>();
-				ArrayList<String> listeValeurs = new ArrayList<String>();
-				
-				listeNomDeColonne.add(nomDeColonne);
-				listeValeurs.add(nouvelleValeur);
-				
-				t.modifierContenuColonne(listeNomDeColonne, listeValeurs);
-				System.out.println(listeNomDeColonne.toString());
-				break;
-			}
-			
-		}
-		
-	}
-
+	// ***** Ajouter une nouvelle saisie update ? *****
+	
 	public static void updateSyntaxe2(String saisie, DataBase db) {
 		//"UPDATE nomTable SET nom_du_champ = 'nouvelle valeur', nom_du_champ1 = 'nouvelle valeur1' ;"
 		System.out.println("\nSaisie: " +saisie);
@@ -507,6 +563,8 @@ public class Programme {
 		}
 	}
 
+	// En cours
+	
 	public static void updateSyntaxe3(String saisie, DataBase db) {
 		//"UPDATE nomTable SET nom_du_champ = 'nouvelle valeur' WHERE nom_du_champ = 'ancienne valeur';"
 		System.out.println("\nSaisie :" +saisie);
@@ -543,27 +601,8 @@ public class Programme {
 		}
 		
 	}	
-	
-	public static void deleteSyntaxe1(String saisie, DataBase db) {
-		//"DELETE FROM  nomTable ;"
-		System.out.println("\nSaisie :" +saisie);
-		String[] etape0 = saisie.split(";");//vire le ';'
-		String[] etape1 = etape0[0].split("DELETE FROM ");//vire le "DELETE FROM "
-		String nomTable = etape1[1]; // get nom de la table
-		System.out.println("Nom de la table: " + nomTable);
-		
-		for (Table t : db.getListeDesTables()) {
-			
-			if (t.getNom().equals(nomTable)) {
-				
-				System.out.println(t.getNom());
-			
-				t.supprimerEnsembleLigne();
-				
-				break;
-			}
-		}
-	}
+
+	// ***** fonctions table ko (Pas de modification) ***** 
 	
 	public static void deleteSyntaxe2(String saisie, DataBase db) {
 		
