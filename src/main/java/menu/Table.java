@@ -1,8 +1,9 @@
 package menu;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class Table {
+public class Table implements Serializable {
 	
 	// ======================= Attributs ======================== //
 
@@ -79,6 +80,8 @@ public class Table {
 			if (cible.getNom().equals(nom)) {
 				retour = true;
 			}
+			
+			
 		}
 		return retour;
 	}//FAIT
@@ -117,6 +120,7 @@ public class Table {
 		
 	} //FAIT
 
+	
 	// =============== READ(SELECT) =============== //
 	
 	// (3 - Syntaxe 1) Affichage de toutes les données de la table
@@ -148,10 +152,14 @@ public class Table {
 			for (int i=0; i<listeDeColonne.size(); i++)
 				if (cible.getNom().equals(listeDeColonne.get(i)) ) {
 					temp.listeDeColonne.add(cible);
+					System.out.println("Ajout de " +cible.getNom()+" A "+temp.getNom() +"BOOP!");
 				}
 		}
 		System.out.println("BOOP");
 		temp.affichageDeDonnees();
+		for (int i=0; i <temp.getListeDeColonne().get(0).getLenght(); i++) {
+			System.out.println(temp.getListeDeColonne().get(0).getContenu(i));
+		}
 		System.out.println("BOOP");
 		}
 	//FAIT
