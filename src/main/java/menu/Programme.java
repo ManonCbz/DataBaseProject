@@ -314,7 +314,7 @@ public class Programme {
 			// Si la commande est SELECT * FROM nomTable Order by nom_du_champ ASC;
 			else if (dbUtilisee != null && m12.find() == true) {
 				commandeOk = true;
-				selectFrom(commande, dbUtilisee);
+				selectFromASC(commande, dbUtilisee);
 			}
 
 			
@@ -643,17 +643,12 @@ public class Programme {
 		}
 	}
 
-	// ====================== En cours de traitement ====================== //
-		
 	// Méthode de saisie pour SELECT nom_du_champ FROM nomTable;
 	// Appel la méthode affichageDeColonne() de Table.java pour afficher les colonnes demandées
 	
-	// ***** saisie (ok une colonne, ko + d'1) *****
-	// ***** fonctions table ko (IndexOutOfBoundsException) *****
-
 	public static void selectFrom(String saisie, DataBase db) {
 		
-		//verifie s'il y a des virgules et plusiers colonnes cibles
+		//Vérifie s'il y a des virgules et plusieurs colonnes cibles
 		
 		ArrayList <String> listeDeColonne = new ArrayList <String> ();
 		String[] etape0;
@@ -678,8 +673,6 @@ public class Programme {
 			etape2 = etape1[1].split(";");
 			nomTable = etape2[0];
 			
-			System.out.println("nomColonne : " + listeDeColonne.toString()+ " nomTable : " + nomTable);
-
 			// Vérifie si la table et la colonne existent & appel la méthode affichageColonne() de Table.java
 			
 			boolean tableIsInDB = false;
@@ -701,13 +694,13 @@ public class Programme {
 			}
 		
 	}
-		
-	// ***** fonctions table ko (Pas de modification) ***** 
+
+	// Méthode de saisie pour DELETE FROM nomTable WHERE nomColonne = 'valeur';
+	// Appel la méthode supprimerLigneCible() de Table.java pour supprimer les lignes contenant les valeurs demandées
 	
 	public static void deleteSyntaxe2(String saisie, DataBase db) {
 		
 		//"DELETE FROM nomTable WHERE nom_du_champ = 'valeur';"
-		System.out.println("\nSaisie :" +saisie);
 		String[] etape0 = saisie.split(";");//vire le ';'
 		String[] etape1 = etape0[0].split("DELETE FROM ");//vire le "DELETE FROM "
 		etape0 = etape1[1].split("WHERE ");//split au WHERE
@@ -716,22 +709,54 @@ public class Programme {
 		String nomDeColonne = etape1[0];
 		etape0 = etape1[1].split("'");
 		String valeur = etape0[1];
-		
-		System.out.println("Nom de la table: " +nomTable+ "\nNom de colonne: " +nomDeColonne + "\nValeur: "+valeur);
-	
+			
 		for (Table t : db.getListeDesTables()) {
 			
 			if (t.getNom().equals(nomTable)) {
-				
-				System.out.println(t.getNom());
-			
+							
 				t.supprimerLigneCible(valeur, nomDeColonne);;
-				
+				System.out.println("  Les données ont bien été supprimées");
 				break;
 			}
 		}
 	}
 
+	
+	// ====================== En cours de traitement ====================== //
+	
+	// Méthode de saisie pour SELECT * FROM nomTable Order by nomColonne ASC;
+	// Appel la méthode () de Table.java pour afficher les lignes par ordre croissant
+	
+	public static void selectFromASC(String saisie, DataBase db) {
+		
+		// Split des elements à retirer de la saisie
+        
+		String[] etape0 = saisie.split("SELECT \\* FROM ");
+                
+        String[] etape1 = etape0[1].split(" ASC;");
+        
+        String[] etape2 = etape1[0].split(" Order by ");
+        String nomTable = etape2[0];
+        String nomColonne = etape2[1];
+        
+        
+        // Vérifie si la table existe & appel la méthode () de Table.java
+        
+		boolean tableIsInDB = false;
+        
+        for (Table t : db.getListeDesTables()) {
+        	if (t.getNom().equals(nomTable)) {
+        		tableIsInDB = true;
+        		// t.fonction()
+        		break;
+        	}
+        }
+        
+        if (tableIsInDB == false) {
+        	System.out.println("   Cette table n'existe pas");
+        }
+        
+	}
 	
 	// ====================== Serialize / Deserialize ====================== //
 	
