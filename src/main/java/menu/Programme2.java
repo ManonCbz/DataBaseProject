@@ -123,10 +123,10 @@ public class Programme2 {
 			//Marche
 			Pattern p5 = Pattern.compile("^UPDATE \\w+ SET \\w+ = '[a-zA-Z0-9 ]+'(, \\w+ = '[a-zA-Z0-9 ]+')*;$");
 			Matcher m5 = p5.matcher(commande);
-			//Marche en syntaxe 1 mais pas syntaxe 2;
+			//Marche en syntaxe 1 et (maintenant) avec syntaxe 2;
 			Pattern p6 = Pattern.compile("^UPDATE \\w+ SET \\w+ = '[a-zA-Z0-9 ]+'(, \\w+ = '[a-zA-Z0-9 ]+')* WHERE \\w+ = '[a-zA-Z0-9 ]+';$");
 			Matcher m6 = p6.matcher(commande);
-			//Ne marche pas;
+			//Marche
 			Pattern p7 = Pattern.compile("^SELECT \\* FROM \\w+;$");
 			Matcher m7 = p7.matcher(commande);
 			//Marche			
@@ -143,7 +143,7 @@ public class Programme2 {
 			Matcher m11 = p11.matcher(commande);
 			//Marche
 			
-			//11 methodes 8 marches 2 ne marche pas, 1 ne marche pas totalement;
+			//11 methodes 9 marches 1 ne marche pas, 1 ne marche pas totalement;
 			
 			// ============= Conditions qui lance chaque commande & leurs méthodes ============= //
 
@@ -619,9 +619,9 @@ public class Programme2 {
 		System.out.println("\nSaisie :" +saisie);
 		String[] etape0 = saisie.split(";");//vire le ';'
 		String[] etape1 = etape0[0].split("UPDATE ");//vire le UPDATE
-		etape0 = etape1[1].split("SET ");//vire le SET
+		etape0 = etape1[1].split(" SET ");//vire le SET
 		String nomTable = etape0[0]; // get nom de la table
-		etape1 = etape0[1].split("WHERE");//split au WHERE
+		etape1 = etape0[1].split("WHERE ");//split au WHERE
 		etape0 = etape1[0].split(" = ");;//split au " = "
 		String nomDeColonne = etape0[0];
 		String nouvelleValeur = etape0[1];
@@ -631,19 +631,19 @@ public class Programme2 {
 		nouvelleValeur = etape0[1];
 		etape0=ancienneValeur.split("'");
 		ancienneValeur = etape0[1];
-		//Vérifie que les deux noms de colonne son identique:
+		//Vérifie que les deux noms de colonne sont identique:
 		if ( !(nomDeColonne.equals(etape2[0])) ) {
 			System.out.println("ERREUR Les colonnes sont differentes!");
-		}
+			}
 		System.out.println("Nom de la table: " +nomTable +"\nNom de Colonne: "+nomDeColonne+ "\nNouvelle Valeur: "+nouvelleValeur + "\nAncienne Valeur: " +ancienneValeur);
 	
 		for (Table t : db.getListeDesTables()) {
 			
 			if (t.getNom().equals(nomTable)) {
-				
+				System.out.println("FOUND!");
 				System.out.println(t.getNom());
 			
-				t.modifierContenuCible(nomDeColonne, ancienneValeur, nouvelleValeur);
+				t.modifierContenuCible(nomDeColonne, nouvelleValeur, ancienneValeur);
 				
 				break;
 			}
@@ -688,7 +688,7 @@ public class Programme2 {
 	    
 		try {
 	        
-			FileOutputStream fos = new FileOutputStream("D:\\ENV\\Workspace\\DataBase\\DB.txt");
+			FileOutputStream fos = new FileOutputStream("C:\\ENV\\WORKSPACE\\DataBaseProject\\DB.txt");
 	        ObjectOutputStream outputStream = new ObjectOutputStream(fos);
 	        
 	        outputStream.writeObject(liste);
@@ -707,7 +707,7 @@ public class Programme2 {
 	    ArrayList<DataBase> listePersonne = new ArrayList<>();
 	    
 	    try {
-	           FileInputStream fichier = new FileInputStream("D:\\ENV\\Workspace\\DataBase\\DB.txt");
+	           FileInputStream fichier = new FileInputStream("C:\\ENV\\WORKSPACE\\DataBaseProject\\DB.txt");
 	           ObjectInputStream objet = new ObjectInputStream(fichier);
 	            
 	           listePersonne = (ArrayList) objet.readObject();
