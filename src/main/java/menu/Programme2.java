@@ -542,38 +542,52 @@ public class Programme2 {
 
 	public static void selectFrom(String saisie, DataBase db) {
 		
-		// Split des elements à retirer de la saisie et mise en variable/liste des elements à conserver
+		//verifie s'il y a des virgules et plusiers colonnes cibles
 		
-        String[] etape0 = saisie.split("SELECT ");
-        
-        String[] etape1 = etape0[1].split(" FROM ");
-        String nomColonne = etape1[0];
-                
-        String[] etape2 = etape1[1].split(";");
-        String nomTable = etape2[0];
-        
-        System.out.println("nomColonne : " + nomColonne + " nomTable : " + nomTable);
-        
-        ArrayList <String> listeDeColonne = new ArrayList <String> ();
-        listeDeColonne.add(nomColonne);
-        
-        // Vérifie si la table et la colonne existent & appel la méthode affichageColonne() de Table.java
-        
-		boolean tableIsInDB = false;
-     
-        for (Table t : db.getListeDesTables()) {
-        	if (t.getNom().equals(nomTable)) {
-        		tableIsInDB = true;
-        		if (t.colonneExiste(nomColonne)) {
-        			t.affichageColonne(listeDeColonne);	
-        		} else System.out.println("Cette colonne n'existe pas!");
-        		break;
-        	}
-        }
-        
-        if (tableIsInDB == false) {
-        	System.out.println("   Cette table n'existe pas!");
-        }
+		ArrayList <String> listeDeColonne = new ArrayList <String> ();
+		String[] etape0;
+		String[] etape1;
+		String[] etape2;
+		String nomTable = "";
+		if (saisie.indexOf(',')==-1) {
+			// Split des elements à retirer de la saisie et mise en variable/liste des elements à conserver
+			
+			etape0 = saisie.split("SELECT ");
+			etape1 = etape0[1].split(" FROM ");
+			listeDeColonne.add(etape1[0]);
+		} else {
+		
+			etape0 = saisie.split("SELECT ");
+			etape1 = etape0[1].split(" FROM ");
+			etape2 = etape1[0].split(", ");
+			for (int i=0; i<(etape2.length); i++) {
+				listeDeColonne.add(etape2[i]);
+			}
+		}
+			etape2 = etape1[1].split(";");
+			nomTable = etape2[0];
+			
+			System.out.println("nomColonne : " + listeDeColonne.toString()+ " nomTable : " + nomTable);
+
+			// Vérifie si la table et la colonne existent & appel la méthode affichageColonne() de Table.java
+			
+			boolean tableIsInDB = false;
+			
+			for (Table t : db.getListeDesTables()) {
+				if (t.getNom().equals(nomTable)) {
+					tableIsInDB = true;
+					for (String nomColonne : listeDeColonne) {
+					if (t.colonneExiste(nomColonne)) {
+						t.affichageColonne(listeDeColonne);	
+					} else System.out.println("Colonne "+nomColonne +" n'existe pas!");
+					break;
+					}
+				}
+			}
+			
+			if (tableIsInDB == false) {
+				System.out.println("   Une des tables demandées n'existe pas!");
+			}
 		
 	}
 

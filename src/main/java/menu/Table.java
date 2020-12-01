@@ -146,34 +146,33 @@ public class Table implements Serializable {
 	// Vide
 	public void affichageColonne(ArrayList<String> listeDeColonne) {
 		//	Creer une table temporaire avec ses colonnes
-		Table temp = new Table (this.getNom());
+		Table tempT = new Table (this.getNom());
+		int compte = 0;
 		for (Colonne cible: this.listeDeColonne) {
 				for (int i=0; i<listeDeColonne.size(); i++)
 				if (cible.getNom().equals(listeDeColonne.get(i)) ) {
-					temp.listeDeColonne.add(cible);
+					compte++;}
+		}
+		if (compte==listeDeColonne.size()) { 
+		tempT.creerColonne(listeDeColonne, "*temp*");
+		ArrayList<String> listeValeurs = new ArrayList<String> ();
+		for (int i=0; i<this.index; i++) {
+			for (Colonne cibleCun : this.listeDeColonne) {
+				for (String cibleCdeux : listeDeColonne) {
+					if (cibleCun.getNom().equals(cibleCdeux) ) {
+						listeValeurs.add(cibleCun.getContenu(i));
+						System.out.println("Ajoute: " +cibleCun.getContenu(i)+" à la liste");
 					}
-		}
-		System.out.println("+----------+");
-		System.out.print("|");
-		String titre = temp.listeDeColonne.get(0).getNom();
-		System.out.print(titre);
-		for (int i=0;i< (12 -( 2+titre.length() )); i++ ){
-			System.out.print(" ");
-		}
-		System.out.print("|\n");
-		System.out.println("+----------+");
-		for (int i=0; i <temp.getListeDeColonne().get(0).getLenght(); i++) {
-			System.out.print("|");
-			String tempStr = temp.getListeDeColonne().get(0).getContenu(i); 
-			System.out.print(tempStr);
-			for (int j=0;j< (12 -( 2+tempStr.length() )) ;j++ ){
-				System.out.print(" ");
+				}
 			}
-			System.out.print("|\n");
+			tempT.ajoutLigne(listeValeurs);
+			System.out.println("Ajoute la ligne: " +listeValeurs+" à la table");
+			listeValeurs = new ArrayList<String> ();
 			
 		}
+		tempT.affichageDeDonnees();
+		} else System.out.println("Colonnes choisis incorrectes!");
 		
-		System.out.println("+----------+");
 		}
 	//FAIT
 	
@@ -200,7 +199,8 @@ public class Table implements Serializable {
 		for (Colonne cible: this.listeDeColonne)
 		{
 			if (cible.getNom().equals(nomDeColonne)) {
-				for (int i=0; i<cible.getLenght() ; i++) {
+					for (int i=0; i<cible.getLenght() ; i++) {
+					System.out.println(cible.getContenu(i));
 					if (cible.getContenu(i).equals(nomCible)) {
 						cible.setContenu(nomCible, nouveauContenu);
 					}
