@@ -161,17 +161,15 @@ public class Table implements Serializable {
 				for (String cibleCdeux : listeDeColonne) {
 					if (cibleCun.getNom().equals(cibleCdeux) ) {
 						listeValeurs.add(cibleCun.getContenu(i));
-						System.out.println("Ajoute: " +cibleCun.getContenu(i)+" à la liste");
 					}
 				}
 			}
 			tempT.ajoutLigne(listeValeurs);
-			System.out.println("Ajoute la ligne: " +listeValeurs+" à la table");
 			listeValeurs = new ArrayList<String> ();
 			
 		}
 		tempT.affichageDeDonnees();
-		} else System.out.println("Colonnes choisis incorrectes!");
+		} else System.out.println("  Colonnes choisis incorrectes!");
 		
 		}
 	//FAIT
@@ -187,7 +185,6 @@ public class Table implements Serializable {
 				if (cible.getNom().equals(nomDeColonne.get(i))) {
 					cible.setallContenu(nouveauContenu.get(i));
 				}
-			System.out.println("yep");
 		}
 	
 	}//FAIT
@@ -200,15 +197,12 @@ public class Table implements Serializable {
 		{
 			if (cible.getNom().equals(nomDeColonne)) {
 					for (int i=0; i<cible.getLenght() ; i++) {
-					System.out.println(cible.getContenu(i));
 					if (cible.getContenu(i).equals(nomCible)) {
 						cible.setContenu(nomCible, nouveauContenu);
 					}
 				}
-				
 			}
 		}
-		System.out.println(nomDeColonne + " " + nouveauContenu + " " + nomCible);
 		
 	}//FAIT
 	
