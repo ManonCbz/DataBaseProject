@@ -261,7 +261,7 @@ public class Table implements Serializable {
 	
 	public void methodeAfficheContenu (int colonneCible, int ligneCible) {// affiche le contenu de la lign cible dans la colonne cible
 		String affiche = this.listeDeColonne.get(colonneCible).getContenu(ligneCible);
-		if (affiche != null) {
+		if (affiche != "") {
 			if (colonneCible == 0) {// si c'est la premiere colonne on ajoute le '|'
 				System.out.print("|");
 			} 

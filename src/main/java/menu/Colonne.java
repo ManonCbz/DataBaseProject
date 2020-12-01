@@ -59,7 +59,7 @@ public class Colonne implements Serializable{
 			 txt = this.ligne.get(index);
 		}
 		else {
-			txt = "Il n'y a rien à cet index";
+			txt = "";
 		}
 		
 		return txt;

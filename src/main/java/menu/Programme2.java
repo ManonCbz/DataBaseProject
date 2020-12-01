@@ -673,7 +673,7 @@ public class Programme2 {
 		System.out.println("\nSaisie :" +saisie);
 		String[] etape0 = saisie.split(";");//vire le ';'
 		String[] etape1 = etape0[0].split("DELETE FROM ");//vire le "DELETE FROM "
-		etape0 = etape1[1].split("WHERE ");//split au WHERE
+		etape0 = etape1[1].split(" WHERE ");//split au WHERE
 		String nomTable = etape0[0]; // get nom de la table
 		etape1 = etape0[1].split(" = ");//split au =
 		String nomDeColonne = etape1[0];
