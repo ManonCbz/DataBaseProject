@@ -220,7 +220,7 @@ public class Programme {
 			Pattern p11 = Pattern.compile("^SHOW TABLES;$");
 			Matcher m11 = p11.matcher(commande);
 			
-			Pattern p12 = Pattern.compile("^SELECT \\* FROM \\w+ Order by \\w+ ASC;$");
+			Pattern p12 = Pattern.compile("^SELECT \\* FROM \\w+ Order by \\w+( ASC;$|| DESC;$)");
 			Matcher m12 = p12.matcher(commande);
 			
 			// ============= Conditions qui lance chaque commande & leurs méthodes ============= //
@@ -728,16 +728,19 @@ public class Programme {
 	// Appel la méthode () de Table.java pour afficher les lignes par ordre croissant
 	
 	public static void selectFromASC(String saisie, DataBase db) {
-		
+		boolean verite= false;
+		String[] etape1 = new String[0];
+		if (saisie.contains("ASC")) {
+			verite = true;}
 		// Split des elements à retirer de la saisie
         
 		String[] etape0 = saisie.split("SELECT \\* FROM ");
-                
-        String[] etape1 = etape0[1].split(" ASC;");
-        
-        String[] etape2 = etape1[0].split(" Order by ");
-        String nomTable = etape2[0];
-        String nomColonne = etape2[1];
+        if (verite) {
+        	etape1 = etape0[1].split(" ASC;");
+        } else etape1 = etape0[1].split(" DESC;");
+        etape0 = etape1[0].split(" Order by ");
+        String nomTable = etape0[0];
+        String nomColonne = etape0[1];
         
         
         // Vérifie si la table existe & appel la méthode () de Table.java
@@ -747,7 +750,7 @@ public class Programme {
         for (Table t : db.getListeDesTables()) {
         	if (t.getNom().equals(nomTable)) {
         		tableIsInDB = true;
-        		// t.fonction()
+        		t.afficheASCDESC(nomColonne, verite);
         		break;
         	}
         }
@@ -755,8 +758,8 @@ public class Programme {
         if (tableIsInDB == false) {
         	System.out.println("   Cette table n'existe pas");
         }
-        
 	}
+	
 	
 	// ====================== Serialize / Deserialize ====================== //
 	
@@ -764,7 +767,7 @@ public class Programme {
 	    
 		try {
 	        
-			FileOutputStream fos = new FileOutputStream("C:\\Users\\MDenh\\Documents\\txt\\DataBases.txt");
+			FileOutputStream fos = new FileOutputStream("C:\\ENV\\WORKSPACE\\DataBases.txt");
 	        ObjectOutputStream outputStream = new ObjectOutputStream(fos);
 	        
 	        outputStream.writeObject(liste);
@@ -782,7 +785,7 @@ public class Programme {
 	    
 		try {
 	        
-			FileOutputStream fos = new FileOutputStream("C:\\Users\\MDenh\\Documents\\txt\\Users.txt");
+			FileOutputStream fos = new FileOutputStream("C:\\ENV\\WORKSPACE\\Users.txt");
 	        ObjectOutputStream outputStream = new ObjectOutputStream(fos);
 	        
 	        outputStream.writeObject(liste);
@@ -801,7 +804,7 @@ public class Programme {
 	    ArrayList<DataBase> listeDB = new ArrayList<>();
 	    
 	    try {
-	           FileInputStream fichier = new FileInputStream("C:\\Users\\MDenh\\Documents\\txt\\DataBases.txt");
+	           FileInputStream fichier = new FileInputStream("C:\\ENV\\WORKSPACE\\DataBases.txt");
 	           ObjectInputStream objet = new ObjectInputStream(fichier);
 	            
 	           listeDB = (ArrayList) objet.readObject();
@@ -821,7 +824,7 @@ public class Programme {
 	    ArrayList<User> listeUser = new ArrayList<>();
 	    
 	    try {
-	           FileInputStream fichier = new FileInputStream("C:\\Users\\MDenh\\Documents\\txt\\Users.txt");
+	           FileInputStream fichier = new FileInputStream("C:\\ENV\\WORKSPACE\\Users.txt");
 	           ObjectInputStream objet = new ObjectInputStream(fichier);
 	            
 	           listeUser = (ArrayList) objet.readObject();

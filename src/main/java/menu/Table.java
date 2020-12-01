@@ -2,6 +2,9 @@ package menu;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.TreeMap;
 
 public class Table implements Serializable {
 	
@@ -277,4 +280,39 @@ public class Table implements Serializable {
 		
 	}
 	
+	public void afficheASCDESC (String nomDeColonne, boolean asc) {
+		Colonne ord = new Colonne(nomDeColonne);
+		TreeMap <String, String > treemap0 = new TreeMap <String, String> ();
+		TreeMap <String, String > treemap1 = new TreeMap <String, String> (Collections.reverseOrder());
+		for (Colonne cible : this.listeDeColonne) {
+			if (cible.getNom().equals(nomDeColonne)) {
+				 ord=cible;
+			}
+		}
+		String aggregation = "";
+		for (int i=0; i<ord.getLenght(); i++) {
+			for (Colonne cible : this.listeDeColonne) {
+				if (!(cible.getNom().equals(nomDeColonne) )) {
+					aggregation=aggregation.concat(" | "+cible.getContenu(i));
+				}
+				
+			}aggregation=aggregation.concat(" |");
+			treemap0.put(ord.getContenu(i), aggregation );
+			treemap1.put(ord.getContenu(i), aggregation );
+			aggregation = "";
+			}
+		
+		if (asc) {
+			for (String it : treemap0.keySet()) {
+				System.out.println("| "+it + treemap0.get(it));
+			}
+			} else {
+			for (String it : treemap1.keySet()) {
+				System.out.println("| "+it + treemap1.get(it));
+			}
+		
+		}
+		
+	}
+
 }

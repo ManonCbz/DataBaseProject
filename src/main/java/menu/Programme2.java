@@ -132,18 +132,18 @@ public class Programme2 {
 			//Marche			
 			Pattern p8 = Pattern.compile("^SELECT \\w+(, [a-zA-Z0-9 ]+)* FROM \\w+;$");
 			Matcher m8 = p8.matcher(commande);
-			//Marche avec une seule Colonne			
+			//Marche			
 			Pattern p9 = Pattern.compile("^DELETE FROM \\w+;$");
 			Matcher m9 = p9.matcher(commande);
 			//Marche			
 			Pattern p10 = Pattern.compile("^DELETE FROM \\w+ WHERE \\w+ = '\\w+';$");
 			Matcher m10 = p10.matcher(commande);
-			//Ne marche pas;			
+			//Marche			
 			Pattern p11 = Pattern.compile("^SHOW TABLES;$");
 			Matcher m11 = p11.matcher(commande);
 			//Marche
 			
-			//11 methodes 9 marches 1 ne marche pas, 1 ne marche pas totalement;
+			//11 methodes 11 marches
 			
 			// ============= Conditions qui lance chaque commande & leurs méthodes ============= //
 
