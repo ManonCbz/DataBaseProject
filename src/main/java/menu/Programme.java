@@ -9,20 +9,15 @@ import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-	
+
 public class Programme {
 
 	public static void main(String[] args) {
 		
 		// Listes de données de notre application
 		
-		ArrayList<User> listeUtilisateurs = new ArrayList<User>();
-		ArrayList<DataBase> listeBasesDeDonnees = deserialize();
-		
-		// Création d'un utilisateur test
-		
-		User u1 = new User("test", "test", "test");
-		listeUtilisateurs.add(u1);
+		ArrayList<User> listeUtilisateurs = deserializeUser();
+		ArrayList<DataBase> listeBasesDeDonnees = deserializeDB();
 		
 		// Début du programme
 		
@@ -33,10 +28,10 @@ public class Programme {
 		User utilisateurConnecte = null;
 		
 		do {
-			utilisateurConnecte = log(scan, listeUtilisateurs);			
+			utilisateurConnecte = connexion(scan, listeUtilisateurs);
 		}
 		while (utilisateurConnecte == null);
-
+		
 		menu(scan, listeBasesDeDonnees);
 		
 		System.out.println("+--------------------------------------------------------+");
@@ -44,6 +39,40 @@ public class Programme {
 		
 	}
 	
+	public static User connexion(Scanner scan, ArrayList<User> listeUtilisateurs) {
+		
+		int choice = 0;
+		User user = null;
+		boolean erreur = true;
+		
+		do {
+			System.out.println(""
+					+ "+--------------------------------------------------------+\n"
+					+ "|                       Connexion                        |\n"
+					+ "+--------------------------------------------------------+\n");
+			
+			System.out.println("  1 - Se connecter | 2 - S'inscrire");
+			choice = scan.nextInt();
+
+			switch (choice) {
+				case 1 :
+					user = log(scan, listeUtilisateurs);
+					break;
+				case 2 :
+					user = inscription(scan, listeUtilisateurs);
+					break;
+			}
+			
+			
+			System.out.println(""
+					+ "                                                          \n"
+					+ "+--------------------------------------------------------+\n");
+			
+		}
+		while (user == null);
+		
+		return user;
+	}
 	
 	// Fonction de connexion, retourne un utilisateur 
 	
@@ -83,6 +112,55 @@ public class Programme {
 			
 		}
 		while (choice != 0);
+		
+		return user;
+	}
+	
+	// Fonction inscription .. nouvel utilisateur
+	
+	public static User inscription(Scanner scan, ArrayList<User> listeUtilisateurs) {
+		
+		int choice = 0;
+
+		User user = null;
+		
+		do {
+			System.out.println(""
+					+ "+--------------------------------------------------------+\n"
+					+ "|                      Inscription                       |\n"
+					+ "+--------------------------------------------------------+\n");
+			
+			
+			System.out.println("  Nom : ");
+			String nom = scan.next();
+			
+			System.out.println("  Login (Pseudo) : ");
+			String login = scan.next();
+			
+			for (User u : listeUtilisateurs) {
+				if(login.equals(u.getLogin())) {
+					do {
+						System.out.println("   Ce pseudo est déjà pris\nPseudo : ");
+						login = scan.next();
+					}
+					while (login.equals(u.getLogin()));								
+				}
+			}
+			
+			System.out.println("  Mot de passe : ");
+			String motDePasse = scan.next();
+			
+			user = new User(nom, login, motDePasse);
+			listeUtilisateurs.add(user);
+			
+			serializeUser(listeUtilisateurs);
+			
+			System.out.println(""
+					+ "                                                          \n"
+					+ "+--------------------------------------------------------+\n");
+			
+		}
+		while (choice != 0 || user == null);
 		
 		return user;
 	}
@@ -150,7 +228,7 @@ public class Programme {
 			if (m1.find() == true) {
 				createDB(commande, listeBaseDeDonnnees);
 				commandeOk = true;
-				serialize(listeBaseDeDonnnees);
+				serializeDB(listeBaseDeDonnnees);
 			}
 			// Si la commande est : USE DATABASE
 			else if (m2.find() == true) {
@@ -175,28 +253,28 @@ public class Programme {
 				commandeOk = true;
 				createTable(commande, dbUtilisee);
 				dbUtilisee.affichageStructure();
-				serialize(listeBaseDeDonnnees);
+				serializeDB(listeBaseDeDonnnees);
 			}
 			
 			// Si la commande est INSERT INTO
 			else if (dbUtilisee != null && m4.find() == true) {
 				commandeOk = true;
 				insertInto(commande, dbUtilisee);
-				serialize(listeBaseDeDonnnees);
+				serializeDB(listeBaseDeDonnnees);
 			}
 			
 			// Si la commande est UPDATE
 			else if (dbUtilisee != null && m5.find() == true) {
 				commandeOk = true;
 				updateSyntaxe1(commande, dbUtilisee);
-				serialize(listeBaseDeDonnnees);
+				serializeDB(listeBaseDeDonnnees);
 			}
 			
 			// Si la commande est UPDATE WHERE
 			else if (dbUtilisee != null && m6.find() == true) {
 				commandeOk = true;
 				updateSyntaxe3(commande, dbUtilisee);
-				serialize(listeBaseDeDonnnees);
+				serializeDB(listeBaseDeDonnnees);
 			}
 			
 			//Si la commande est SELECT * FROM
@@ -215,14 +293,14 @@ public class Programme {
 			else if (dbUtilisee != null && m9.find() == true) {
 				commandeOk = true;
 				deleteSyntaxe1(commande, dbUtilisee);
-				serialize(listeBaseDeDonnnees);
+				serializeDB(listeBaseDeDonnnees);
 			}
 			
 			// Si la commande est DELETE FROM nomTable WHERE nom_du_champ = 'valeur'
 			else if (dbUtilisee != null && m10.find() == true) {
 				commandeOk = true;
 				deleteSyntaxe2(commande, dbUtilisee);
-				serialize(listeBaseDeDonnnees);
+				serializeDB(listeBaseDeDonnnees);
 			}
 			
 			// Si la commande est SHOW TABLES;
@@ -450,57 +528,116 @@ public class Programme {
 	}
 	
 	// Méthode de saisie pour UPDATE nomTable SET nom_du_champ = 'nouvelle valeur';
-	// Appel la méthode modifierContenuColonne() de Table.java pour effacer toutes les données
+	// Appel la méthode modifierContenuColonne() de Table.java pour modifier toutes les données demandé
 
 	public static void updateSyntaxe1(String saisie, DataBase db) {
 
 		// Split des elements à retirer de la saisie
+		String[] etape0 ;
+		String[] etape1 ;
+		String nomTable = "";
+		ArrayList <String> listeDeColonne = new ArrayList <String> ();
+		ArrayList <String> listeDeValeur = new ArrayList <String> ();
+		int verite = saisie.indexOf(',');
 		
-		String[] etape0 = saisie.split(";");
-		String[] etape1 = etape0[0].split("UPDATE ");
-		etape0 = etape1[1].split(" SET ");
-		String nomTable = etape0[0];
+		if (verite == -1) {
+			
+			etape0 = saisie.split(";");
+			etape1 = etape0[0].split("UPDATE ");
+			etape0 = etape1[1].split(" SET ");
+			nomTable = etape0[0];
+			etape1 = etape0[1].split(" = ");
+			listeDeColonne.add(etape1[0]);
+			etape0=etape1[1].split("'");
+			listeDeValeur.add(etape0[1]);
+			
+		}else {
+				
+				etape0 = saisie.split(";");//vire le ';'
+				etape1 = etape0[0].split("UPDATE ");//vire le UPDATE
+				etape0 = etape1[1].split(" SET "); // split au SET
+				nomTable = etape0[0]; // recupere nom de la table
+				etape1 = etape0[1].split(", ");//split au ", "
+				for (int i=0; i<etape1.length; i++) {//parcoure le split
+					String[] temp0 = etape1[i].split(" = ");// split au =
+					listeDeColonne.add(temp0[0]); // met le nom dans ça liste
+					String[] temp1 = temp0[1].split("'"); // split au '
+					listeDeValeur.add(temp1[1]); // met la valeur dans ça liste}
+					}
+				
+				}
 		
-		etape1 = etape0[1].split(" = ");
-		String nomDeColonne= etape1[0];
-		etape0=etape1[1].split("'");
-		String nouvelleValeur = etape0[1];
-		
-		
-        // Vérifie si la table existe & appel la méthode modifierContenuColonne() de Table.java
+		// Vérifie si la table existe & appel la méthode modifierContenuColonne() de Table.java
 		
 		boolean tableIsInDB = false;
 		
 		for (Table t : db.getListeDesTables()) {
-						
 			if (t.getNom().equals(nomTable)) {
-				
 				tableIsInDB = true;
 				
 				ArrayList<String> listeNomDeColonne = new ArrayList<String>();
 				ArrayList<String> listeValeurs = new ArrayList<String>();
-				
-				listeNomDeColonne.add(nomDeColonne);
-				listeValeurs.add(nouvelleValeur);
-				
+				for (String temp : listeDeColonne) {
+					listeNomDeColonne.add(temp);
+					}
+				for (String temp : listeDeValeur) {
+					listeValeurs.add(temp);
+				}
 				t.modifierContenuColonne(listeNomDeColonne, listeValeurs);
-				System.out.println("   La colonne " + nomDeColonne + " à bien été mise à jour");
-				break;
-			}
+				if (verite == -1)
+					{
+					System.out.println("   La colonne a bien été mise à jour");
+					}
+				else System.out.println("   Les colonnes ont bien été mise à jour");
+				}
 			
 		}
 		
         if (tableIsInDB == false) {
-        	System.out.println("   Cette table n'existe pas");
+        	System.out.println("   Cette table n'existe pas!");
         }
 		
+	}
+
+	// Méthode de saisie pour UPDATE nomTable SET nom_du_champ = 'nouvelle valeur' WHERE nom_du_champ = 'ancienne valeur';
+	// Appel la méthode modifierContenuCible() de Table.java pour modifier toutes les données demandé
+	
+	public static void updateSyntaxe3(String saisie, DataBase db) {
+		//"UPDATE nomTable SET nom_du_champ = 'nouvelle valeur' WHERE nom_du_champ = 'ancienne valeur';"
+		String[] etape0 = saisie.split(";");//vire le ';'
+		String[] etape1 = etape0[0].split("UPDATE ");//vire le UPDATE
+		etape0 = etape1[1].split(" SET ");//vire le SET
+		String nomTable = etape0[0]; // get nom de la table
+		etape1 = etape0[1].split("WHERE ");//split au WHERE
+		etape0 = etape1[0].split(" = ");;//split au " = "
+		String nomDeColonne = etape0[0];
+		String nouvelleValeur = etape0[1];
+		String[] etape2 = etape1[1].split(" = ");;//split au " = "
+		String ancienneValeur = etape2[1];
+		etape0=nouvelleValeur.split("'");
+		nouvelleValeur = etape0[1];
+		etape0=ancienneValeur.split("'");
+		ancienneValeur = etape0[1];
+		
+		//Vérifie que les deux noms de colonne sont identique:
+		if ( !(nomDeColonne.equals(etape2[0])) ) {
+			System.out.println("ERREUR Les colonnes sont differentes!");
+			}
+	
+		for (Table t : db.getListeDesTables()) {
+			
+			if (t.getNom().equals(nomTable)) {
+				t.modifierContenuCible(nomDeColonne, nouvelleValeur, ancienneValeur);
+				System.out.println("  Les données ont bien été mise à jour");
+				break;
+			}
+		}
 	}
 
 	// ====================== En cours de traitement ====================== //
 		
 	// Méthode de saisie pour SELECT nom_du_champ FROM nomTable;
 	// Appel la méthode affichageDeColonne() de Table.java pour afficher les colonnes demandées
-	
 	
 	// ***** saisie (ok une colonne, ko + d'1) *****
 	// ***** fonctions table ko (IndexOutOfBoundsException) *****
@@ -539,81 +676,7 @@ public class Programme {
         }
 		
 	}
-
-	// ***** Ajouter une nouvelle saisie update ? *****
-	
-	public static void updateSyntaxe2(String saisie, DataBase db) {
-		//"UPDATE nomTable SET nom_du_champ = 'nouvelle valeur', nom_du_champ1 = 'nouvelle valeur1' ;"
-		System.out.println("\nSaisie: " +saisie);
-		String[] etape0 = saisie.split(";");//Retire le ';'
-		String[] etape1 = etape0[0].split("UPDATE ");//Retire le UPDATE
-		etape0 = etape1[1].split("SET "); // split au SET
-		String nomTable = etape0[0]; // Récupère nom de la table
-		etape1 = etape0[1].split(", ");//split au ", "
-		ArrayList <String> listeDeColonne = new ArrayList <String> (); // stockage des noms de colonnes 
-		ArrayList <String> listeDeValeur = new ArrayList <String> (); // stockage des valeurs
-		for (int i=0; i<etape1.length; i++) {//parcours le split
-			String[] temp0 = etape1[i].split(" = ");// split au =
-			listeDeColonne.add(temp0[0]); // met le nom dans sa liste
-			String[] temp1 = temp0[1].split("'"); // split au '
-			listeDeValeur.add(temp1[1]); // met la valeur dans sa liste
-		}
-		System.out.println("Nom de la table: " +nomTable);
-		System.out.println(listeDeColonne.toString());
-		System.out.println(listeDeValeur.toString());
 		
-		for (Table t : db.getListeDesTables()) {
-			
-			if (t.getNom().equals(nomTable)) {
-				
-				System.out.println(t.getNom());
-				
-				t.modifierContenuColonne(listeDeColonne, listeDeValeur);
-
-				break;
-			}
-		}
-	}
-
-	// En cours
-	
-	public static void updateSyntaxe3(String saisie, DataBase db) {
-		//"UPDATE nomTable SET nom_du_champ = 'nouvelle valeur' WHERE nom_du_champ = 'ancienne valeur';"
-		System.out.println("\nSaisie :" +saisie);
-		String[] etape0 = saisie.split(";");//vire le ';'
-		String[] etape1 = etape0[0].split("UPDATE ");//vire le UPDATE
-		etape0 = etape1[1].split("SET ");//vire le SET
-		String nomTable = etape0[0]; // get nom de la table
-		etape1 = etape0[1].split("WHERE");//split au WHERE
-		etape0 = etape1[0].split(" = ");;//split au " = "
-		String nomDeColonne = etape0[0];
-		String nouvelleValeur = etape0[1];
-		String[] etape2 = etape1[1].split(" = ");;//split au " = "
-		String ancienneValeur = etape2[1];
-		etape0=nouvelleValeur.split("'");
-		nouvelleValeur = etape0[1];
-		etape0=ancienneValeur.split("'");
-		ancienneValeur = etape0[1];
-		//Vérifie que les deux noms de colonne son identique:
-		if ( !(nomDeColonne.equals(etape2[0])) ) {
-			System.out.println("ERREUR Les colonnes sont differentes!");
-		}
-		System.out.println("Nom de la table: " +nomTable +"\nNom de Colonne: "+nomDeColonne+ "\nNouvelle Valeur: "+nouvelleValeur + "\nAncienne Valeur: " +ancienneValeur);
-	
-		for (Table t : db.getListeDesTables()) {
-			
-			if (t.getNom().equals(nomTable)) {
-				
-				System.out.println(t.getNom());
-			
-				t.modifierContenuCible(nomDeColonne, ancienneValeur, nouvelleValeur);
-				
-				break;
-			}
-		}
-		
-	}	
-
 	// ***** fonctions table ko (Pas de modification) ***** 
 	
 	public static void deleteSyntaxe2(String saisie, DataBase db) {
@@ -647,11 +710,11 @@ public class Programme {
 	
 	// ====================== Serialize / Deserialize ====================== //
 	
-	static void serialize(ArrayList<DataBase> liste) {
+	static void serializeDB(ArrayList<DataBase> liste) {
 	    
 		try {
 	        
-			FileOutputStream fos = new FileOutputStream("C:\\Users\\MDenh\\Documents\\txt\\DataBase.txt");
+			FileOutputStream fos = new FileOutputStream("C:\\Users\\MDenh\\Documents\\txt\\DataBases.txt");
 	        ObjectOutputStream outputStream = new ObjectOutputStream(fos);
 	        
 	        outputStream.writeObject(liste);
@@ -665,15 +728,33 @@ public class Programme {
 	    }
 	}
 	
-	static ArrayList<DataBase> deserialize() {
+	static void serializeUser(ArrayList<User> liste) {
+	    
+		try {
+	        
+			FileOutputStream fos = new FileOutputStream("C:\\Users\\MDenh\\Documents\\txt\\Users.txt");
+	        ObjectOutputStream outputStream = new ObjectOutputStream(fos);
+	        
+	        outputStream.writeObject(liste);
+	        outputStream.close();
+	        
+	    }
+	    catch (IOException e) {
+	    	
+	        e.getMessage();
+	        
+	    }
+	}
+	
+	static ArrayList<DataBase> deserializeDB() {
 		
-	    ArrayList<DataBase> listePersonne = new ArrayList<>();
+	    ArrayList<DataBase> listeDB = new ArrayList<>();
 	    
 	    try {
-	           FileInputStream fichier = new FileInputStream("C:\\Users\\MDenh\\Documents\\txt\\DataBase.txt");
+	           FileInputStream fichier = new FileInputStream("C:\\Users\\MDenh\\Documents\\txt\\DataBases.txt");
 	           ObjectInputStream objet = new ObjectInputStream(fichier);
 	            
-	           listePersonne = (ArrayList) objet.readObject();
+	           listeDB = (ArrayList) objet.readObject();
 	            
 	           objet.close();
 	           fichier.close();
@@ -682,6 +763,26 @@ public class Programme {
 	          catch (IOException | ClassNotFoundException ex) {
 	           System.err.println(ex);
 	      }
-	      return listePersonne;
+	      return listeDB;
+	}  
+	
+	static ArrayList<User> deserializeUser() {
+		
+	    ArrayList<User> listeUser = new ArrayList<>();
+	    
+	    try {
+	           FileInputStream fichier = new FileInputStream("C:\\Users\\MDenh\\Documents\\txt\\Users.txt");
+	           ObjectInputStream objet = new ObjectInputStream(fichier);
+	            
+	           listeUser = (ArrayList) objet.readObject();
+	            
+	           objet.close();
+	           fichier.close();
+	           
+	      } 
+	          catch (IOException | ClassNotFoundException ex) {
+	           System.err.println(ex);
+	      }
+	      return listeUser;
 	}  
 }
